@@ -9,7 +9,10 @@ There are the following things needed to get it to work:
     
     docker-sw-gerrit/gits needs All-Projects.git and All-Users.git plus any
     gits you want available within the cbuildsystem
-    
+
+    docker-sw-gerrit-postgres needs a copy of the live dbdump saved as 
+    docker-sw-gerrit-postgres/gerrit_backup.sql    
+
     docker-jenkins-master/chroot.d & docker-jenkins-child/chroot.d need
     the chroot config's for any projects you wish to use
     
