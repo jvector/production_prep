@@ -1,0 +1,21 @@
+{
+	"ALL_ARCHITECTURES": ["i386", "amd64"],
+	"JENKINS":        "http://@JENKINS_MASTER@:8080/",
+	"JENKINS_NODES":  [
+		"@JENKINS_MASTER@",
+		"@JENCHILD1@",
+		"@JENCHILD2@"
+	],
+	"GERRIT":         "@GERRIT@",
+	"GIT_SSH":        "ssh://build@localhost:29418/",
+	"VCS_REPO":       "/usr/src/gerrit/deb/",
+	"DEB_REPO":       "/usr/src/repository/",
+	"METADATA":       "/usr/src/dev-metadata/",
+	"REPO_URL":       "http://repo.soton.smoothwall.net/smoothwall",
+	"SCHROOT_CONFS":  "/etc/schroot/chroot.d/",
+	"SCHROOT_TARS":   "/srv/chroot/",
+	"SBUILD_CONFS":   "/etc/sbuild/chroot/",
+	"SCHROOT_HELPER": "/usr/src/buildsystem/genesis/genesis-make-schroot",
+	"SMOOTHDOC":      "/mnt/build/smoothdoc/",
+	"PNET_METAHOST":  "10.0.1.33"
+}

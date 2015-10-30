@@ -1,0 +1,5 @@
+$maintainer_name = 'David Hubner <david.hubner@smoothwall.net>';
+$uploader_name   = 'David Hubner <david.hubner@smoothwall.net>';
+$path = '/bin:/usr/bin:/sbin:/usr/sbin';
+
+1;

@@ -1,0 +1,17 @@
+# Settings for "sbuild" profile.
+# See schroot.conf(5) and schroot-script-config(5) for further details.
+# The files detailed below may also be edited to further customise
+# this profile.
+
+# Filesystems to mount inside the chroot.
+FSTAB="/etc/schroot/smoothwall/fstab"
+
+# Files to copy from the host system into the chroot.
+COPYFILES="/etc/schroot/smoothwall/copyfiles"
+
+# System NSS databases to copy into the chroot.
+NSSDATABASES="/etc/schroot/smoothwall/nssdatabases"
+
+# Add our build user into the passwd of the chroot.
+# BUILDUSER?
+ADDBUILDUSER="jenkins"
