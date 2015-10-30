@@ -1,0 +1,1098 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson>
+  <disabledAdministrativeMonitors>
+    <string>jenkins.security.RekeySecretAdminMonitor</string>
+    <string>OldData</string>
+    <string>jenkins.diagnostics.SecurityIsOffMonitor</string>
+  </disabledAdministrativeMonitors>
+  <version>1.565.2</version>
+  <numExecutors>4</numExecutors>
+  <mode>NORMAL</mode>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
+  <securityRealm class="hudson.security.SecurityRealm$None"/>
+  <disableRememberMe>false</disableRememberMe>
+  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+  <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter" plugin="antisamy-markup-formatter@1.3">
+    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
+  </markupFormatter>
+  <jdks/>
+  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+  <clouds/>
+  <slaves>
+    <slave>
+      <name>jenchild1</name>
+      <description></description>
+      <remoteFS>/home/jenkins</remoteFS>
+      <numExecutors>@JENCHILD1_EXECUTORS@</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher" plugin="ssh-slaves@1.9">
+        <host>@JENCHILD1_HOST@</host>
+        <port>9500</port>
+        <credentialsId>bb7fcef4-6c79-443a-8f0c-b227e0485017</credentialsId>
+        <maxNumRetries>0</maxNumRetries>
+        <retryWaitTime>0</retryWaitTime>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+    <slave>
+      <name>jenchild2</name>
+      <description></description>
+      <remoteFS>/home/jenkins</remoteFS>
+      <numExecutors>@JENCHILD2_EXECUTORS@</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher" plugin="ssh-slaves@1.9">
+        <host>@JENCHILD2_HOST@</host>
+        <port>9500</port>
+        <credentialsId>bb7fcef4-6c79-443a-8f0c-b227e0485017</credentialsId>
+        <maxNumRetries>0</maxNumRetries>
+        <retryWaitTime>0</retryWaitTime>
+      </launcher>
+      <label></label>
+      <nodeProperties/>
+    </slave>
+  </slaves>
+  <quietPeriod>5</quietPeriod>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <views>
+    <hudson.model.AllView>
+      <owner class="hudson" reference="../../.."/>
+      <name>All</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+    </hudson.model.AllView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Master</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/Master/job/patchgen--master/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/Master/job/ISO--master/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/master/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;The main integration branch, which maps to &lt;em&gt;smoothwall&lt;/em&gt; and &lt;em&gt;unstable&lt;/em&gt; in the Debian repository.&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>ISO--master</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <includeRegex>.*--master$</includeRegex>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Templates</name>
+      <description>&#xd;
+Templates used by genesis to create new jobs.</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>releasegen--master</string>
+        <string>Template-patchgen</string>
+        <string>Template-smoothdoc</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.JobColumn/>
+      </columns>
+      <includeRegex>^Template-.*</includeRegex>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FR55</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/FR55/job/patchgen--fr55/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FR55/job/ISO--fr55/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/fr55/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FR55&lt;/strong&gt; &amp;mdash; Data Compression&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--fr55$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>IR44</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/IR44/job/patchgen--ir44/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/IR44/job/ISO--ir44/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/ir44/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;IR44&lt;/strong&gt; &amp;mdash; Internal Release 44 - Package Bumps&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--ir44$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FR65</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/FR65/job/patchgen--fr65/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FR65/job/ISO--fr65/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/fr65/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FR65&lt;/strong&gt; &amp;mdash; Chromebook Authenication 2&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--fr65$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>IR48</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #eeffaa; background-color: #eeffaa;&quot;&#xd;
+href=&quot;/view/IR48/job/release--ir48/&quot;&#xd;
+&gt;Make PVI&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/IR48/job/patchgen--ir48/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/IR48/job/ISO--ir48/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/ir48/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;IR48&lt;/strong&gt; &amp;mdash; Internal Release 48 - BETA Process&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[5]/jobNames/comparator"/>
+        <string>release--ir48</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--ir48$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FR63</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/FR63/job/patchgen--fr63/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FR63/job/ISO--fr63/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/fr63/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FR63&lt;/strong&gt; &amp;mdash; Negotiate auth&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--fr63$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FR66</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/FR66/job/patchgen--fr66/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FR66/job/ISO--fr66/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/fr66/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FR66&lt;/strong&gt; &amp;mdash; Guardian3 Multitenant Categories&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[7]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--fr66$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>IR48B</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/Master/job/releasegen--master/&quot;&#xd;
+&gt;BOSH!&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/IR48B/job/ISO--ir48B/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/ir48B/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;IR48B&lt;/strong&gt; &amp;mdash; Internal Release 48B - BETA Process&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--ir48B$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>DATASTORE-RD</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/DATASTORE-RD/job/patchgen--datastore-rd/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/DATASTORE-RD/job/ISO--datastore-rd/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/datastore-rd/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;DATASTORE-RD&lt;/strong&gt; &amp;mdash; Datastore R&amp;D&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--datastore-rd$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>DOVER</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/DOVER/job/patchgen--dover/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/DOVER/job/ISO--dover/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/dover/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;DOVER&lt;/strong&gt; &amp;mdash; Project Dover&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[10]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--dover$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FR68B</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/FR68B/job/patchgen--fr68b/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FR68B/job/ISO--fr68b/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/fr68b/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FR68B&lt;/strong&gt; &amp;mdash; Certificate Management Take 2&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[10]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--fr68b$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>DOVER-REPORTING</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/DOVER-REPORTING/job/patchgen--dover-reporting/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/DOVER-REPORTING/job/ISO--dover-reporting/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/dover-reporting/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;DOVER-REPORTING&lt;/strong&gt; &amp;mdash; Project Dover Reporting&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--dover-reporting$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>DOVER-INTEGRATION</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/DOVER-INTEGRATION/job/patchgen--dover-integration/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/DOVER-INTEGRATION/job/ISO--dover-integration/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/dover-integration/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;DOVER-INTEGRATION&lt;/strong&gt; &amp;mdash; Project Dover Integration&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--dover-integration$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>RANDD-OMEGA</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/RANDD-OMEGA/job/patchgen--randd-omega/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/RANDD-OMEGA/job/ISO--randd-omega/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/randd-omega/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;RANDD-OMEGA&lt;/strong&gt; &amp;mdash; &lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--randd-omega$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>CARISBROOKE-P1</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/CARISBROOKE-P1/job/patchgen--carisbrooke-p1/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/CARISBROOKE-P1/job/ISO--carisbrooke-p1/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/carisbrooke-p1/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;CARISBROOKE-P1&lt;/strong&gt; &amp;mdash; Project Carisbrooke Patch 1&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--carisbrooke-p1$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>EDINBURGH</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH/job/patchgen--edinburgh/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH/job/ISO--edinburgh/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/edinburgh/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;EDINBURGH&lt;/strong&gt; &amp;mdash; Project Edinburgh&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--edinburgh$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>EDINBURGH-ENDEAVOUR</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-ENDEAVOUR/job/patchgen--edinburgh-endeavour/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-ENDEAVOUR/job/ISO--edinburgh-endeavour/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/edinburgh-endeavour/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;EDINBURGH-ENDEAVOUR&lt;/strong&gt; &amp;mdash; Project Edinburgh Shenanigans&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--edinburgh-endeavour$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>EDINBURGH-GALAHAD</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-GALAHAD/job/patchgen--edinburgh-galahad/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-GALAHAD/job/ISO--edinburgh-galahad/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/edinburgh-galahad/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;EDINBURGH-GALAHAD&lt;/strong&gt; &amp;mdash; Project Edinburgh Galahad&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--edinburgh-galahad$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>BOSH</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/BOSH/job/patchgen--bosh/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/BOSH/job/ISO--bosh/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/bosh/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;BOSH&lt;/strong&gt; &amp;mdash; Project Bosh&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--bosh$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>CARISBROOKE-P2</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ddffaa; background-color: #ddffaa;&quot;&#xd;
+href=&quot;/view/CARISBROOKE-P2/job/patchgen--carisbrooke-p2/&quot;&#xd;
+&gt;Patch Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/CARISBROOKE-P2/job/ISO--carisbrooke-p2/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/carisbrooke-p2/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;CARISBROOKE-P2&lt;/strong&gt; &amp;mdash; Project Carisbrooke Patch 2&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[14]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--carisbrooke-p2$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>EDINBURGH-RESKIN</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-RESKIN/job/ISO--edinburgh-reskin/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/edinburgh-reskin/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;EDINBURGH-RESKIN&lt;/strong&gt; &amp;mdash; Project Edinburgh Reskin&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--edinburgh-reskin$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>EDINBURGH-GRIMBOLD</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/EDINBURGH-GRIMBOLD/job/ISO--edinburgh-grimbold/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/edinburgh-grimbold/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;EDINBURGH-GRIMBOLD&lt;/strong&gt; &amp;mdash; Project Edinburgh Grimbold&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[22]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--edinburgh-grimbold$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FRAMLINGHAM</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FRAMLINGHAM/job/ISO--framlingham/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/framlingham/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FRAMLINGHAM&lt;/strong&gt; &amp;mdash; Project Framlingham&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[22]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--framlingham$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>FRAMLINGHAM-GRIMBOLD</name>
+      <description>&lt;div style=&quot;float: right; margin-bottom: 0.5ex;&quot;&gt;&#xd;
+&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #ffeeaa; background-color: #ffeeaa;&quot;&#xd;
+href=&quot;/view/FRAMLINGHAM-GRIMBOLD/job/ISO--framlingham-grimbold/&quot;&#xd;
+&gt;ISO Builds&lt;/a&gt;&#xd;
+&lt;a style=&quot;display: inline-block; padding: 1ex 2ex;&#xd;
+text-decoration: none; color: black;&#xd;
+border: 1px outset #aaddee; background-color: #aaddee;&quot;&#xd;
+href=&quot;@BUILDLOG_ADDR@/framlingham-grimbold/&quot;&#xd;
+&gt;Project History Log&lt;/a&gt;&#xd;
+&lt;/div&gt;&#xd;
+&lt;p&gt;&lt;strong&gt;FRAMLINGHAM-GRIMBOLD&lt;/strong&gt; &amp;mdash; Project F&apos;ingham Grimbold&lt;/p&gt;&#xd;
+&lt;div style=&quot;clear: right;&quot; /&gt;&#xd;
+</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>true</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../listView[22]/jobNames/comparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex>.*--framlingham-grimbold$</includeRegex>
+      <recurse>true</recurse>
+    </listView>
+  </views>
+  <primaryView>Master</primaryView>
+  <slaveAgentPort>0</slaveAgentPort>
+  <label></label>
+  <nodeProperties/>
+  <globalNodeProperties/>
+  <noUsageStatistics>true</noUsageStatistics>
+</hudson>

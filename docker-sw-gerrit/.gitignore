@@ -1,0 +1,4 @@
+shared_build/*
+jenkins_user.sql
+.gnupg/*
+apt-keys/*
