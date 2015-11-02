@@ -60,23 +60,20 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& cd -
 
 # Change sbuild.conf to allow env variables
-# Relies on shared_build file's existing in /this/ dir, see above
-COPY shared_build/sbuild.conf /etc/sbuild/sbuild.conf
+# Relies on shared_buildsystem file's existing in /this/ dir, see above
+COPY shared_buildsystem/sbuild.conf /etc/sbuild/sbuild.conf
 
 #COPY
 	# buildsystem - Common files are copied in via mkbuildsystem script. If
 	# you want to build this manually, and the files don't exist it will error.
 	# Circumvent this by copying manually from one level up, or run copy_shared in
 	# container_functions.sh
-COPY shared_build /usr/src/
+COPY shared_buildsystem /usr/src/
 	#Plugins
 COPY plugins/ ${JENKINS_HOME}/plugins
 COPY plugins.txt /plugins.txt
 	#Config files
 COPY config_files/ ${JENKINS_HOME}
-	# SSH keys
-COPY .ssh /var/jenkins_home/.ssh
-COPY ssh_conf /var/jenkins_home/.ssh/config
 	#Scripts
 COPY scripts/ /scripts
 COPY jenkins-start.sh /
@@ -96,40 +93,24 @@ COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edi
 	# but that requires redownloading all the plugins (which don't change)
 	# each time it is built
 COPY pluginjars/ /usr/share/jenkins/ref/plugins
-	# BUILDUSER?
-	# GPG keys
-COPY .gnupg/ /var/jenkins_home/.gnupg
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN chmod g-s /usr/src/
 RUN useradd build
-RUN adduser build src
-RUN chown root:src /usr/src/ -Rf
-RUN chmod 775 /usr/src/ -Rf
-RUN usermod -G src jenkins
-COPY .ssh /home/build/.ssh
-COPY .sbuildrc /home/build/.sbuildrc
+RUN chown build:build /usr/src/ -Rf
 
 # Install aptly
 RUN /usr/src/aptly_setup.sh
 
 # FIXME: This should be mounted via buildfs, for now we make our
 # own scratch folder for builds to run in.
-# BUILDUSER?
-RUN mkdir -p /mnt/build/.debian-results && chown -R jenkins:jenkins /mnt/build
+RUN mkdir -p /mnt/build/.debian-results && chown -R build:build /mnt/build
 
-# BUILDUSER?
-# FIXME: Find who permissions need to be.. If we use Jenkins.. needs to be jenkins
-# likewise this can be user build if build. For now, let everyone use it.
-RUN chmod -R 777 /mnt/build
-
-# BUILDUSER?
 # For now this is jenkins, might need changing to build.
 # sbuild user config
-RUN sbuild-adduser jenkins
-COPY .sbuildrc /var/jenkins_home/.sbuildrc
+RUN sbuild-adduser build
+COPY .sbuildrc /home/build/.sbuildrc
 
 # sbuild global config
 COPY smoothwall/ /etc/schroot/smoothwall

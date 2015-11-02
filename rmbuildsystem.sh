@@ -17,6 +17,9 @@ source container_functions.sh
 rm_jenkins
 rm_postgres
 rm_gerrit
-rm_shared_build_copies
+rm_shared_buildsystem_copies
 rm_from_repo
+rm_from_home_build_mount
 rm_gnupg
+rm_apt-keys
+rm_shared_jenkins

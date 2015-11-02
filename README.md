@@ -5,7 +5,7 @@ There are the following things needed to get it to work:
     
     cbuild-secrets merged in
     
-    shared_build needs cloned into it: buildsystem.git and dev-metadata.git
+    shared_buildsystem needs cloned into it: buildsystem.git and dev-metadata.git
     
     docker-sw-gerrit/gits needs All-Projects.git and All-Users.git plus any
     gits you want available within the cbuildsystem

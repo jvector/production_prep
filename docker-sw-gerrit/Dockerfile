@@ -32,7 +32,7 @@ RUN apt-get update && apt-get -y -q install \
 # you want to build this manually, and the files don't exist it will error.
 # Circumvent this by copying manually from one level up, or run copy_shared in
 # container_functions.sh
-COPY shared_build /usr/src/
+COPY shared_buildsystem /usr/src/
     # SSH
 COPY .ssh/ /var/gerrit/.ssh
     # Scripts
@@ -52,22 +52,13 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN chmod g-s /usr/src/
 RUN useradd build
-RUN adduser build src
-RUN chown root:src /usr/src/ -Rf
-RUN chmod 775 /usr/src/ -Rf
-RUN usermod -G src gerrit2
-COPY .ssh /home/build/.ssh
+RUN chown build:build /usr/src/ -Rf
 
 # Let build own everything
 RUN chown -R build:build /usr/src/
 # But let gerrit2 own everything in gerrit
 RUN chown -R gerrit2:gerrit2 /usr/src/gerrit
-
-# GPG keys for build user
-COPY .gnupg/ /home/build/.gnupg
-RUN chown -R build:build /home/build/.gnupg
 
 # Run config scripts
     # Install aptly

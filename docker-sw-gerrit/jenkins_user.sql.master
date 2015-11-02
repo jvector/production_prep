@@ -1,2 +1,2 @@
 INSERT INTO account_ssh_keys (ssh_public_key, valid, account_id, seq)
-VALUES ('@JENKINS_SSH_KEY@', 'Y', 1000022, 2);
+VALUES ('@BUILD_SSH_KEY@', 'Y', 1000022, 2);

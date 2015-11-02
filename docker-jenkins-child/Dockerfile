@@ -45,18 +45,14 @@ RUN apt-get update && apt-get -y upgrade \
 # nfs-common, portmap
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
-RUN useradd -m jenkins
+RUN useradd -u 1001 build
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
 # If you want to build this manually, and the files don't exist it will error.
 # Circumvent this by copying manually from one level up, or run copy_shared in
 # container_functions.sh
-COPY shared_build /usr/src/
-RUN chown -R jenkins:jenkins /usr/src/buildsystem
-
-COPY .ssh /home/jenkins/.ssh
-COPY ssh_conf /home/jenkins/.ssh/config
-RUN chown -R jenkins:jenkins /home/jenkins/.ssh
+COPY shared_buildsystem /usr/src/
+RUN chown -R build:build /usr/src/buildsystem
 
 COPY jenkins-child-entrypoint.sh /jenkins-child-entrypoint.sh
 COPY jenkins-child-start.sh /jenkins-child-start.sh
@@ -75,8 +71,7 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 
 # FIXME: This should be mounted via buildfs, for now we make our
 # own scratch folder for builds to run in.
-# BUILDUSER?
-RUN mkdir -p /mnt/build/.debian-results && chown -R jenkins:jenkins /mnt/build
+RUN mkdir -p /mnt/build/.debian-results && chown -R build:build /mnt/build
 
 RUN chmod -R 777 /mnt/build
 
@@ -90,33 +85,20 @@ COPY chroot/ /srv/chroot
 COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
 COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
 
-# BUILDUSER?
-# GPG keys
-# If build user is used this goes away. But for now we have to point this at
-# A non-standard place so that it matches jenmaster. Logically should be /home/jenkins
-# For now copy it into both, with the hope we can standardise/clean up later.
-COPY .gnupg/ /var/jenkins_home/.gnupg
-RUN chown -R jenkins:jenkins /var/jenkins_home/
-# GPG Keys
-COPY .gnupg/ /home/jenkins/.gnupg
 # Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Change sbuild.conf to allow env variables
-# Relies on shared_build file's existing in /this/ dir, see above
-COPY shared_build/sbuild.conf /etc/sbuild/sbuild.conf
+# Relies on shared_buildsystem file's existing in /this/ dir, see above
+COPY shared_buildsystem/sbuild.conf /etc/sbuild/sbuild.conf
 
-# BUILDUSER?
-# For now this is jenkins, might need changing to build.
 # sbuild user config
-RUN sbuild-adduser jenkins
-COPY .sbuildrc /var/jenkins_home/.sbuildrc
+RUN sbuild-adduser build
+COPY .sbuildrc /home/build/.sbuildrc
 
 # sbuild global config
 COPY smoothwall/ /etc/schroot/smoothwall
 RUN ln -s /usr/src/buildsystem/sbuildhooks/sbuild-hook-addbuilduser /etc/schroot/setup.d/30addbuilduser
-
-RUN chown -R jenkins:jenkins /home/jenkins
 
 ENTRYPOINT ["/jenkins-child-entrypoint.sh"]
 

@@ -45,32 +45,21 @@ function fail {
 
 # Precursor function to generate ssh keys for jenkins master->child
 function generate_keys {
-
-    # Remove old jenkins key if it exists, to stop moaning
-    if [ -e docker-jenkins-master/.ssh/id_rsa ] ; then
-        rm  -f docker-jenkins-master/.ssh/id_rsa docker-jenkins-master/.ssh/id_rsa.pub
-    fi
-    ssh-keygen -N "" -f docker-jenkins-master/.ssh/id_rsa -C "Generated_by_DockerFile_for_docker-jenkins-master"
-    cp docker-jenkins-master/.ssh/id_rsa.pub docker-jenkins-child/.ssh/authorized_keys
-    # The master has to ssh into the child, but also the child has to look like the master to talk to gerrit
-    # Live solves this w/ NIS build user
-    # BUILDUSER?
-    cp docker-jenkins-master/.ssh/id_rsa.pub docker-jenkins-child/.ssh/id_rsa.pub
-    cp docker-jenkins-master/.ssh/id_rsa docker-jenkins-child/.ssh/id_rsa
+    # Make the key for build user
+    ssh-keygen -N "" -f shared_home/build/.ssh/id_rsa -C "Generated_by_DockerFile_for_build_user"
 
     # Copy jenkins' key into SQL template
-    sed -e "s:@JENKINS_SSH_KEY@:$(cat docker-jenkins-master/.ssh/id_rsa.pub):" \
+    sed -e "s:@BUILD_SSH_KEY@:$(cat shared_home/build/.ssh/id_rsa.pub):" \
     docker-sw-gerrit/jenkins_user.sql.master > docker-sw-gerrit/jenkins_user.sql
 
-    # Also copy our key to the gerrit container's authorized keys
-    cp docker-jenkins-master/.ssh/id_rsa.pub docker-sw-gerrit/.ssh/authorized_keys
+    # Give the same key to Gerrit2
+    cp shared_home/build/.ssh/id_rsa.pub docker-sw-gerrit/.ssh/id_rsa.pub
+    cp shared_home/build/.ssh/id_rsa docker-sw-gerrit/.ssh/id_rsa
 
-    # Similarly for gerrit, create a public key and pass it to jenkins
-    if [ -e docker-sw-gerrit/.ssh/id_rsa ] ; then
-        rm  -f docker-sw-gerrit/.ssh/id_rsa docker-sw-gerrit/.ssh/id_rsa.pub
-    fi
-    ssh-keygen -N "" -f docker-sw-gerrit/.ssh/id_rsa -C "Generated_by_DockerFile_for_docker-sw-gerrit"
-    cp docker-sw-gerrit/.ssh/id_rsa.pub docker-jenkins-master/.ssh/authorized_keys
+    # Add this key to build users authorized_keys
+    cp docker-sw-gerrit/.ssh/id_rsa.pub shared_home/build/.ssh/authorized_keys
+    
+    cp shared_home/build/ssh_conf /shared_home/build/.ssh/config
 }
 
 function build_jenkins_master {
@@ -109,6 +98,7 @@ function start_jenkins {
         --privileged \
         -v ${JENKINS_DATA}:/var/jenkins_home/jobs \
         -v ${REPO_DATA}:/usr/src/repository \
+        -v ${HOME_BUILD_DATA}:/home \
         -p 9000:8080 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
@@ -129,6 +119,7 @@ function start_jenchild {
     --name=${CHILD_NAME} \
     --privileged \
     -v ${REPO_DATA}:/usr/src/repository \
+    -v ${HOME_BUILD_DATA}:/home \
     -d ${JENKINS_CHILD_IMAGE}
 }
 
@@ -201,6 +192,7 @@ function start_gerrit {
     --link ${JENKINS_MASTER_NAME}:jk \
     -v ${GERRIT_DATA}:/var/gerrit/review_site \
     -v ${REPO_DATA}:/usr/src/repository \
+    -v ${HOME_BUILD_DATA}:/home \
     -p 29418:29418 \
     -p 8080:8080 \
     -e WEBURL=${GERRIT_WEBURL} \
@@ -235,17 +227,17 @@ function copy_shared {
                 docker-sw-gerrit \
                 ;
     do
-        cp -ar shared_build $DEST/
+        cp -ar shared_buildsystem $DEST/
     done
 }
 
-function rm_shared_build_copies {
+function rm_shared_buildsystem_copies {
     for DEST in docker-jenkins-child \
                 docker-jenkins-master \
                 docker-sw-gerrit \
                 ;
     do
-        rm -rf $DEST/shared_build
+        rm -rf $DEST/shared_buildsystem
     done
 }
 
@@ -257,26 +249,58 @@ function rm_from_repo {
     sudo rm -rf $REPO_DATA
 }
 
-function copy_gnupg {
+function copy_into_home_build_mount {
+    mkdir -p $HOME_BUILD_DATA
+    cp -ar shared_home/build $HOME_BUILD_DATA
+}
+
+function rm_from_home_build_mount {
+    sudo rm -rf $HOME_BUILD_DATA
+}
+
+function copy_apt-keys {
     for DEST in docker-jenkins-master \
                 docker-sw-gerrit \
                 docker-jenkins-child \
                 ;
     do
-        cp -ar .gnupg $DEST/.gnupg
         cp -ar apt-keys $DEST/apt-keys
     done 
 }
 
-function rm_gnupg {
+function rm_apt-keys {
     for DEST in docker-jenkins-master \
                 docker-sw-gerrit \
                 docker-jenkins-child \
                 ;
     do
-        rm -rf $DEST/.gnupg
         rm -rf $DEST/apt-keys
     done 
+}
+
+function copy_gnupg {
+    cp -ar .gnupg shared_home/build/.gnupg
+}
+
+function rm_gnupg {
+    rm -rf shared_home/build/.gnupg
+}
+
+function copy_shared_jenkins {
+    for DEST in docker-jenkins-master \
+                docker-jenkins-child \
+                ;
+    do
+        cp -ar shared_jenkins/* $DEST
+    done
+}
+
+function rm_shared_jenkins {
+    for FILE in shared_jenkins/*
+    do
+        rm -rf docker-jenkins-master/$FILE
+        rm -rf docker-jenkins-child/$FILE
+    done
 }
 
 function genesis_config {
@@ -285,5 +309,5 @@ function genesis_config {
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
     configuration.json.master \
-    > shared_build/buildsystem/genesis/configuration.json
+    > shared_buildsystem/buildsystem/genesis/configuration.json
 }

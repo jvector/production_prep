@@ -26,6 +26,9 @@ genesis_config
 copy_shared
 copy_into_repo
 copy_gnupg
+copy_into_home_build_mount
+copy_apt-keys
+copy_shared_jenkins
 build_postgres
 build_gerrit
 build_jenkins

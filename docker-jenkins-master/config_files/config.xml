@@ -26,7 +26,7 @@
     <slave>
       <name>jenchild1</name>
       <description></description>
-      <remoteFS>/home/jenkins</remoteFS>
+      <remoteFS>/home/build</remoteFS>
       <numExecutors>@JENCHILD1_EXECUTORS@</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
@@ -43,7 +43,7 @@
     <slave>
       <name>jenchild2</name>
       <description></description>
-      <remoteFS>/home/jenkins</remoteFS>
+      <remoteFS>/home/build</remoteFS>
       <numExecutors>@JENCHILD2_EXECUTORS@</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>

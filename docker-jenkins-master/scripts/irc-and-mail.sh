@@ -10,4 +10,4 @@ mv /var/jenkins_home/hudson.plugins.ircbot.IrcPublisher.xml-disabled \
 mv /var/jenkins_home/hudson.tasks.Mailer.xml-disabled \
    /var/jenkins_home/hudson.tasks.Mailer.xml
 
-chown -R jenkins /var/jenkins_home/
+chown -R build:build /var/jenkins_home/

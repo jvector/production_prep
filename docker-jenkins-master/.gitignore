@@ -1,5 +1,6 @@
-shared_build/*
-.gnupg
+shared_buildsystem/*
 apt-keys/*
 chroot/*
 chroot.d/*
+smoothwall/*
+.sbuildrc

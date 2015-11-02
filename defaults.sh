@@ -15,3 +15,4 @@ PG_GERRIT_DATA=${BUILD_HOME:-$HOME}/postgres-test
 GERRIT_DATA=${BUILD_HOME:-$HOME}/gerrit-test
 JENKINS_DATA=${BUILD_HOME:-$HOME}/jenkins-test/jobs
 REPO_DATA=${BUILD_HOME:-$HOME}/repo-test/
+HOME_BUILD_DATA=${BUILD_HOME:-$HOME}/home-build-test/

@@ -5,8 +5,8 @@ Full build instructions can be seen in the Dockerfile.
 Contents of /config_files gets put in /var/jenkins_home/
 			/scripts gets put in /
 			/plugins go in /var/jenkins_home/plugins/
-			/shared_build goes in /usr/src/
-				(At make time, shared_build is copied in from one directory up)
+			/shared_buildsystem goes in /usr/src/
+				(At make time, shared_buildsystem is copied in from one directory up)
 
 The contents of .ssh are created and configured when you run mkbuildsystem.sh,
 if you wish to run this without using mkbuildsystem copy the steps within to

@@ -13,5 +13,4 @@ COPYFILES="/etc/schroot/smoothwall/copyfiles"
 NSSDATABASES="/etc/schroot/smoothwall/nssdatabases"
 
 # Add our build user into the passwd of the chroot.
-# BUILDUSER?
-ADDBUILDUSER="jenkins"
+ADDBUILDUSER="build"

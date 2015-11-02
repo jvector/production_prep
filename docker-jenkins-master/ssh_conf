@@ -1,5 +1,0 @@
-Host gerrit
-User build
-HostName gerrit
-Port 29418
-StrictHostKeyChecking No

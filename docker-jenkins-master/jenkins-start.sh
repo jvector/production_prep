@@ -1,8 +1,7 @@
 #!/bin/bash
 # Copyright Smoothwall Ltd 2015
 
-# BUILDUSER?
-USER=jenkins
+USER=build
 
 # A lot of files get copied in as root. To avoid any conflicts, here we 
 # chown everything to jenkins.
