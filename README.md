@@ -24,7 +24,7 @@ You can supply this script with some options.
 | Option | Result |
 | :------ | :------ |
 | -d (0 or 1) | Dev mode ON/OFF, disables IRC & mail on jenkins |
-| -f <defaults file> | Point container_functions.sh at a non-standard defaults file |
+| -f (defaults file) | Point container_functions.sh at a non-standard defaults file |
 
 This will create some folders on host as per the defaults file used by the Containers
 
