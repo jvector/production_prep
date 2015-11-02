@@ -25,6 +25,8 @@ generate_keys
 genesis_config
 copy_shared
 copy_into_repo
+copy_into_shared_src
+copy_into_shared_dev-metadata
 copy_gnupg
 copy_into_home_build_mount
 copy_apt-keys

@@ -46,6 +46,7 @@ function fail {
 # Precursor function to generate ssh keys for jenkins master->child
 function generate_keys {
     # Make the key for build user
+    mkdir -p shared_home/build/.ssh
     ssh-keygen -N "" -f shared_home/build/.ssh/id_rsa -C "Generated_by_DockerFile_for_build_user"
 
     # Copy jenkins' key into SQL template
@@ -53,13 +54,14 @@ function generate_keys {
     docker-sw-gerrit/jenkins_user.sql.master > docker-sw-gerrit/jenkins_user.sql
 
     # Give the same key to Gerrit2
+    mkdir -p docker-sw-gerrit/.ssh
     cp shared_home/build/.ssh/id_rsa.pub docker-sw-gerrit/.ssh/id_rsa.pub
     cp shared_home/build/.ssh/id_rsa docker-sw-gerrit/.ssh/id_rsa
 
     # Add this key to build users authorized_keys
     cp docker-sw-gerrit/.ssh/id_rsa.pub shared_home/build/.ssh/authorized_keys
     
-    cp shared_home/build/ssh_conf /shared_home/build/.ssh/config
+    cp shared_home/build/ssh_conf shared_home/build/.ssh/config
 }
 
 function build_jenkins_master {
@@ -97,6 +99,8 @@ function start_jenkins {
         --link ${JENKINS_CHILD2_NAME}:jenchild2 \
         --privileged \
         -v ${JENKINS_DATA}:/var/jenkins_home/jobs \
+        -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
+        -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
         -v ${REPO_DATA}:/usr/src/repository \
         -v ${HOME_BUILD_DATA}:/home \
         -p 9000:8080 \
@@ -118,6 +122,8 @@ function start_jenchild {
     docker run \
     --name=${CHILD_NAME} \
     --privileged \
+    -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
+    -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
     -d ${JENKINS_CHILD_IMAGE}
@@ -191,6 +197,8 @@ function start_gerrit {
     --link ${PG_GERRIT_NAME}:db \
     --link ${JENKINS_MASTER_NAME}:jk \
     -v ${GERRIT_DATA}:/var/gerrit/review_site \
+    -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
+    -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
     -p 29418:29418 \
@@ -227,22 +235,38 @@ function copy_shared {
                 docker-sw-gerrit \
                 ;
     do
-        cp -ar shared_buildsystem $DEST/
+        cp -ar shared $DEST/
     done
 }
 
-function rm_shared_buildsystem_copies {
+function rm_shared_copies {
     for DEST in docker-jenkins-child \
                 docker-jenkins-master \
                 docker-sw-gerrit \
                 ;
     do
-        rm -rf $DEST/shared_buildsystem
+        rm -rf $DEST/shared
     done
 }
 
+function copy_into_shared_src {
+    cp -ar shared_src/buildsystem $BUILDSYSTEM_DATA
+}
+
+function rm_from_shared_src {
+    sudo rm -rf $BUILDSYSTEM_DATA
+}
+
+function copy_into_shared_dev-metadata {
+    cp -ar shared_src/dev-metadata $DEVMETADATA_DATA
+}
+
+function rm_from_shared_dev-metadata {
+    sudo rm -rf $DEVMETADATA_DATA
+}
+
 function copy_into_repo {
-    cp -ar shared_repo/repository $REPO_DATA
+    cp -ar shared_src/repository $REPO_DATA
 }
 
 function rm_from_repo {
@@ -309,5 +333,5 @@ function genesis_config {
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
     configuration.json.master \
-    > shared_buildsystem/buildsystem/genesis/configuration.json
+    > shared_src/buildsystem/genesis/configuration.json
 }
