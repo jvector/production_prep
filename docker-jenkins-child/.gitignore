@@ -1,4 +1,4 @@
-shared_buildsystem/*
+shared/*
 apt-keys/*
 chroot/*
 chroot.d/*

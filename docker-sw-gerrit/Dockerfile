@@ -32,7 +32,7 @@ RUN apt-get update && apt-get -y -q install \
 # you want to build this manually, and the files don't exist it will error.
 # Circumvent this by copying manually from one level up, or run copy_shared in
 # container_functions.sh
-COPY shared_buildsystem /usr/src/
+COPY shared /usr/src/
     # SSH
 COPY .ssh/ /var/gerrit/.ssh
     # Scripts

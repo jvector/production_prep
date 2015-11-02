@@ -1,3 +1,3 @@
-shared_buildsystem/*
+shared/*
 jenkins_user.sql
 apt-keys/*

@@ -51,8 +51,8 @@ RUN useradd -u 1001 build
 # If you want to build this manually, and the files don't exist it will error.
 # Circumvent this by copying manually from one level up, or run copy_shared in
 # container_functions.sh
-COPY shared_buildsystem /usr/src/
-RUN chown -R build:build /usr/src/buildsystem
+COPY shared /usr/src/
+RUN chown -R build:build /usr/src/
 
 COPY jenkins-child-entrypoint.sh /jenkins-child-entrypoint.sh
 COPY jenkins-child-start.sh /jenkins-child-start.sh
@@ -89,8 +89,8 @@ COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edi
 COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Change sbuild.conf to allow env variables
-# Relies on shared_buildsystem file's existing in /this/ dir, see above
-COPY shared_buildsystem/sbuild.conf /etc/sbuild/sbuild.conf
+# Relies on shared_src file's existing in /this/ dir, see above
+COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 
 # sbuild user config
 RUN sbuild-adduser build

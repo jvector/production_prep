@@ -60,15 +60,15 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& cd -
 
 # Change sbuild.conf to allow env variables
-# Relies on shared_buildsystem file's existing in /this/ dir, see above
-COPY shared_buildsystem/sbuild.conf /etc/sbuild/sbuild.conf
+# Relies on shared_src file's existing in /this/ dir, see above
+COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 
 #COPY
 	# buildsystem - Common files are copied in via mkbuildsystem script. If
 	# you want to build this manually, and the files don't exist it will error.
 	# Circumvent this by copying manually from one level up, or run copy_shared in
 	# container_functions.sh
-COPY shared_buildsystem /usr/src/
+COPY shared /usr/src/
 	#Plugins
 COPY plugins/ ${JENKINS_HOME}/plugins
 COPY plugins.txt /plugins.txt
