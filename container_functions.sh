@@ -15,6 +15,9 @@ else
 	source $DEFAULTS_FILE
 fi
 
+# Docker Network
+DOCKER_NETWORK=${DOCKER_NETWORK:-buildsystem}
+
 # PostgreSQL
 PG_GERRIT_IMAGE=${PG_GERRIT_IMAGE:-sw/gerrit-postgres}
 PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit}
@@ -64,6 +67,14 @@ function generate_keys {
     cp shared_home/build/ssh_conf shared_home/build/.ssh/config
 }
 
+function create_docker_network {
+    docker network create -d bridge ${DOCKER_NETWORK}
+}
+
+function rm_docker_network {
+    docker network rm ${DOCKER_NETWORK}
+}
+
 function build_jenkins_master {
     # Master
     docker build -t ${JENKINS_MASTER_IMAGE} docker-jenkins-master || \
@@ -95,8 +106,6 @@ function start_jenkins {
     # Jenkins Master
     docker run \
         --name ${JENKINS_MASTER_NAME} \
-        --link ${JENKINS_CHILD1_NAME}:jenchild1 \
-        --link ${JENKINS_CHILD2_NAME}:jenchild2 \
         --privileged \
         -v ${JENKINS_DATA}:/var/jenkins_home/jobs \
         -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
@@ -107,6 +116,11 @@ function start_jenkins {
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
         -e "DEV=${DEV}" \
+        -e "JENCHILD1_HOSTNAME=${JENKINS_CHILD1_NAME}" \
+        -e "JENCHILD2_HOSTNAME=${JENKINS_CHILD2_NAME}" \
+        -e "JENCHILD1_EXECUTORS=2" \
+        -e "JENCHILD2_EXECUTORS=2" \
+        --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
 
     echo "Waiting for the jenkins master to become ready ..."
@@ -126,6 +140,7 @@ function start_jenchild {
     -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
+    --net=${DOCKER_NETWORK} \
     -d ${JENKINS_CHILD_IMAGE}
 }
 
@@ -162,6 +177,7 @@ function start_postgres {
     -e POSTGRES_USER=gerrit2 \
     -e POSTGRES_PASSWORD=$PGPASSWORD \
     -e POSTGRES_DB=reviewdb \
+    --net=${DOCKER_NETWORK} \
     -d ${PG_GERRIT_IMAGE}
 
   # This actually only works the first time the container is spun up.
@@ -194,8 +210,6 @@ function start_gerrit {
   echo "Starting Gerrit ..."
   docker run \
     --name ${GERRIT_NAME} \
-    --link ${PG_GERRIT_NAME}:db \
-    --link ${JENKINS_MASTER_NAME}:jk \
     -v ${GERRIT_DATA}:/var/gerrit/review_site \
     -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
     -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
@@ -204,7 +218,9 @@ function start_gerrit {
     -p 29418:29418 \
     -p 8080:8080 \
     -e WEBURL=${GERRIT_WEBURL} \
-    -e DATABASE_TYPE=postgresql \
+    -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
+    -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \
+    --net=${DOCKER_NETWORK} \
     -d ${GERRIT_IMAGE}
 
   echo "Waiting for Gerrit to boot ..."

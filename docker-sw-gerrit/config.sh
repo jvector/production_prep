@@ -1,6 +1,8 @@
 #!/bin/bash
 # Copyright Smoothwall Ltd 2015
 
+source pg-gerrit-password.sh
+
 function set_gerrit_config {
   gosu ${GERRIT_USER} git config -f "${GERRIT_SITE}/etc/gerrit.config" $@
 }
@@ -31,11 +33,20 @@ ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/ho
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
 
 # Get the Jenkins CLI
-wget -P /var/gerrit/review_site http://${JK_PORT_8080_TCP_ADDR}:8080/jnlpJars/jenkins-cli.jar
+wget -P /var/gerrit/review_site http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
 chown -R  ${GERRIT_USER}:${GERRIT_USER} /var/gerrit/
 
-# Save GERRIT_ADDR into ENV - not working
-#export GERRIT_ADDR=${GERRIT_ADDR}:$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+# This was previously handled via linking in pg-gerrit as db and specifying DATABASE_TYPE
+# but docker 1.9 breaks this. If we wan't the containers to be able to communicate via
+# hostname/container name they must be on the non-default bridge network. And linking on
+# custom networks is not allowed.
+set_gerrit_config database.type "postgresql"
+set_gerrit_config database.hostname "${DATABASE_HOSTNAME}"
+set_gerrit_config database.port "5432"
+set_gerrit_config database.database "reviewdb"
+set_gerrit_config database.username "gerrit2"
+# This comes from pg-gerrit-password.sh in cbuild-secrets
+set_secure_config database.password "${PGPASSWORD}"
 
 #[commentlink "bugzilla"]
 #  match = "(bug\\s+#?)(\\d+)"

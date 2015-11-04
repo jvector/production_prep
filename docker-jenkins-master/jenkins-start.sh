@@ -14,10 +14,10 @@ chown -R ${USER}:${USER} /usr/src/repository
 
 # Do some configuration!
 # Insert valid IP's & Executors for the Child nodes
- gosu ${USER} sed -i -e "s/@JENCHILD1_HOST@/$JENCHILD1_PORT_9500_TCP_ADDR/" \
-						 -e "s/@JENCHILD2_HOST@/$JENCHILD2_PORT_9500_TCP_ADDR/" \
-						 -e "s/@JENCHILD1_EXECUTORS@/$JENCHILD1_ENV_EXECUTORS/" \
-						 -e "s/@JENCHILD2_EXECUTORS@/$JENCHILD2_ENV_EXECUTORS/" \
+ gosu ${USER} sed -i -e "s/@JENCHILD1_HOST@/$JENCHILD1_HOSTNAME/" \
+						 -e "s/@JENCHILD2_HOST@/$JENCHILD2_HOSTNAME/" \
+						 -e "s/@JENCHILD1_EXECUTORS@/$JENCHILD1_EXECUTORS/" \
+						 -e "s/@JENCHILD2_EXECUTORS@/$JENCHILD2_EXECUTORS/" \
 						 /var/jenkins_home/config.xml
 
 # Configure x plugin .xml file
