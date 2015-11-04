@@ -35,6 +35,7 @@ build_postgres
 build_gerrit
 build_jenkins
 
+create_docker_network
 start_jenkins
 start_postgres
 start_gerrit

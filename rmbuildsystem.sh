@@ -17,6 +17,7 @@ source container_functions.sh
 rm_jenkins
 rm_postgres
 rm_gerrit
+rm_docker_network
 rm_shared_copies
 rm_from_repo
 rm_from_shared_src

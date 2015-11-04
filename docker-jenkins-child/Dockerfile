@@ -3,8 +3,6 @@
 FROM debian:jessie
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
-ENV EXECUTORS 2
-
 # Prevents invoke-rc.d errors
 RUN sed -i -e "s/^exit 101$/exit 0/" /usr/sbin/policy-rc.d
 
