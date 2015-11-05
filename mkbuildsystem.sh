@@ -52,6 +52,7 @@ function start_containers {
 	create_docker_network
 	start_jenkins
 	start_postgres
+	start_redis
 	start_gerrit
 }
 

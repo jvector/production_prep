@@ -18,6 +18,7 @@ function stop_containers {
 	rm_jenkins
 	rm_postgres
 	rm_gerrit
+	rm_redis
 	rm_docker_network
 }
 
