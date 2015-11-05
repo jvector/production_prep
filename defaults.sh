@@ -18,3 +18,6 @@ REPO_DATA=${BUILD_HOME:-$HOME}/repo-test/
 HOME_BUILD_DATA=${BUILD_HOME:-$HOME}/home-build-test/
 BUILDSYSTEM_DATA=${BUILD_HOME:-$HOME}/buildsystem-test/
 DEVMETADATA_DATA=${BUILD_HOME:-$HOME}/dev-metadata-test/
+MNTBUILD_DATA=${BUILD_HOME:-$HOME}/mnt-build-test/
+APTLY_DATA=${BUILD_HOME:-$HOME}/aptly-test/
+GERRIT_GIT_DATA=${BUILD_HOME:-$HOME}/gerrit-git-data/

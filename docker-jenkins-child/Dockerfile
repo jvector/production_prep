@@ -52,6 +52,9 @@ RUN useradd -u 1001 build
 COPY shared /usr/src/
 RUN chown -R build:build /usr/src/
 
+# Put patch-configuration in the right place
+RUN mv /usr/src/patch-configuration.json /etc/patch-configuration.json
+
 COPY jenkins-child-entrypoint.sh /jenkins-child-entrypoint.sh
 COPY jenkins-child-start.sh /jenkins-child-start.sh
 
@@ -66,12 +69,6 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& make install \
 	&& rm -Rf /root/pod2projdocs \
 	&& cd -
-
-# FIXME: This should be mounted via buildfs, for now we make our
-# own scratch folder for builds to run in.
-RUN mkdir -p /mnt/build/.debian-results && chown -R build:build /mnt/build
-
-RUN chmod -R 777 /mnt/build
 
 # Copy in Chroots
 # FIXME: Should be just copy all chroots in/mount them. For now we just have 
@@ -93,6 +90,9 @@ COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 # sbuild user config
 RUN sbuild-adduser build
 COPY .sbuildrc /home/build/.sbuildrc
+
+# Install aptly
+RUN /usr/src/aptly_setup.sh
 
 # sbuild global config
 COPY smoothwall/ /etc/schroot/smoothwall

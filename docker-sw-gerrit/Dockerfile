@@ -44,9 +44,6 @@ COPY jenkins_user.sql /jenkins_user.sql
 COPY pg-gerrit-password.sh /pg-gerrit-password.sh
     # Gerrit start replace
 COPY gerrit-start.sh /gerrit-start.sh
-    # Gits
-    # FIXME: This may later be mounted
-COPY gits/ /usr/src/gerrit
     # Global repo signing keys
 COPY apt-keys /var/lib/sbuild/apt-keys
 
@@ -55,10 +52,8 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 RUN useradd build
 RUN chown build:build /usr/src/ -Rf
 
-# Let build own everything
-RUN chown -R build:build /usr/src/
-# But let gerrit2 own everything in gerrit
-RUN chown -R gerrit2:gerrit2 /usr/src/gerrit
+# Put patch-configuration in the right place
+RUN mv /usr/src/patch-configuration.json /etc/patch-configuration.json
 
 # Run config scripts
     # Install aptly

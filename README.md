@@ -15,6 +15,8 @@ There are the following things needed to get it to work:
 
 * docker-jenkins-master/chroot & docker-jenkins-child/chroot need the **chroots matching above**
 
+* Copy in **/srv/build/logs** from buildfs to shared_mnt_build/logs \**not essential, build will still succeed without this but project-logger wont work\**
+
 * Lastly you will need to copy (or generate via genesis) the relevant **jobs to match your git(s) & project(s)** into your mounted jenkins/jobs location
 
 #### To bring up the Containers 
@@ -35,6 +37,9 @@ This will create some folders on host as per the defaults file used by the Conta
 * **REPO_DATA** - Stores a shared /usr/src/repository/ between containers
 * **HOME_BUILD_DATA** - Stores a shared /home/build/ between containers
 * **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
+* **MNTBUILD_DATA** - Stores a shared /mnt/build between containers
+* **APTLY_DATA** - Stores a shared /usr/src/aptly between containers
+* **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
 
 #### To remove the Containers
 Run ./rmbuildsystem.sh

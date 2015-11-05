@@ -1,17 +1,18 @@
-<!-- This file has not been configured and hence has been disabled. To enable, change anything that needs
-to be pointing to a different place/value and remove the -disabled on the filename. -->
+<!-- This file simulates SSH'ing to buildfs. This behaviour is odd since
+we have /mnt/build mounted on Jenkins itself but to prevent having to rebuild
+all existing jobs we instead ssh to gerrit which also has /mnt/build mounted
+FIXME: Might not work, even if it does is inelegant
+ -->
 <?xml version='1.0' encoding='UTF-8'?>
 <jenkins.plugins.publish__over__ssh.BapSshPublisherPlugin_-Descriptor plugin="publish-over-ssh@1.11">
   <hostConfigurations>
     <jenkins.plugins.publish__over__ssh.BapSshHostConfiguration>
-      <name>buildfs</name>
-      <hostname>buildfs.soton.smoothwall.net</hostname>
+      <name>gerrit -> /mnt/build</name>
+      <hostname>@GERRIT_HOSTNAME@</hostname>
       <username>build</username>
-      <secretPassword>pMrBCLxJeDkC2yxa/OwIbQ==</secretPassword>
-      <remoteRootDir>/srv/build/isogen</remoteRootDir>
-      <port>22</port>
+      <remoteRootDir>/mnt/build/isogen</remoteRootDir>
+      <port>29418</port>
       <commonConfig class="jenkins.plugins.publish_over_ssh.BapSshCommonConfiguration">
-        <secretPassphrase>pMrBCLxJeDkC2yxa/OwIbQ==</secretPassphrase>
         <key></key>
         <keyPath>/home/build/.ssh/id_rsa</keyPath>
         <disableAllExec>false</disableAllExec>
@@ -20,24 +21,21 @@ to be pointing to a different place/value and remove the -disabled on the filena
       <overrideKey>false</overrideKey>
       <disableExec>false</disableExec>
       <keyInfo>
-        <secretPassphrase>pMrBCLxJeDkC2yxa/OwIbQ==</secretPassphrase>
         <key></key>
         <keyPath></keyPath>
       </keyInfo>
     </jenkins.plugins.publish__over__ssh.BapSshHostConfiguration>
     <jenkins.plugins.publish__over__ssh.BapSshHostConfiguration>
-      <name>buildfs for patches</name>
-      <hostname>buildfs.soton.smoothwall.net</hostname>
+      <name>gerrit -> /mnt/patches</name>
+      <hostname>@GERRIT_HOSTNAME@</hostname>
       <username>build</username>
-      <secretPassword>pMrBCLxJeDkC2yxa/OwIbQ==</secretPassword>
-      <remoteRootDir>/srv/build/patches</remoteRootDir>
-      <port>22</port>
+      <remoteRootDir>/mnt/build/patches</remoteRootDir>
+      <port>29418</port>
       <commonConfig class="jenkins.plugins.publish_over_ssh.BapSshCommonConfiguration" reference="../../jenkins.plugins.publish__over__ssh.BapSshHostConfiguration/commonConfig"/>
       <timeout>300000</timeout>
       <overrideKey>false</overrideKey>
       <disableExec>false</disableExec>
       <keyInfo>
-        <secretPassphrase>pMrBCLxJeDkC2yxa/OwIbQ==</secretPassphrase>
         <key></key>
         <keyPath></keyPath>
       </keyInfo>

@@ -21,21 +21,44 @@ if [ "$DEV" = 1 ]; then
 	echo "Dev mode activated"
 fi
 
-generate_keys
-genesis_config
-copy_shared
-copy_into_repo
-copy_into_shared_src
-copy_into_shared_dev-metadata
-copy_gnupg
-copy_into_home_build_mount
-copy_apt-keys
-copy_shared_jenkins
-build_postgres
-build_gerrit
-build_jenkins
+function setup_config {
+	generate_keys
+	genesis_config
+}
 
-create_docker_network
-start_jenkins
-start_postgres
-start_gerrit
+function copy_into_local {
+	copy_shared
+	copy_gnupg
+	copy_apt-keys
+	copy_shared_jenkins
+}
+
+function copy_into_mounts {
+	copy_into_repo
+	copy_into_shared_src
+	copy_into_shared_dev-metadata
+	copy_into_gerrit_gits
+	copy_into_home_build_mount
+	copy_into_mnt_build
+}
+
+function build_images {
+	build_postgres
+	build_gerrit
+	build_jenkins
+}
+
+function start_containers {
+	create_docker_network
+	start_jenkins
+	start_postgres
+	start_redis
+	start_gerrit
+}
+
+setup_config
+# Copy into local before mounting
+copy_into_local
+copy_into_mounts
+build_images
+start_containers

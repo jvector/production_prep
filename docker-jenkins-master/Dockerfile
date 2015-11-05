@@ -100,12 +100,11 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 RUN useradd build
 RUN chown build:build /usr/src/ -Rf
 
+# Put patch-configuration in the right place
+RUN mv /usr/src/patch-configuration.json /etc/patch-configuration.json
+
 # Install aptly
 RUN /usr/src/aptly_setup.sh
-
-# FIXME: This should be mounted via buildfs, for now we make our
-# own scratch folder for builds to run in.
-RUN mkdir -p /mnt/build/.debian-results && chown -R build:build /mnt/build
 
 # For now this is jenkins, might need changing to build.
 # sbuild user config
