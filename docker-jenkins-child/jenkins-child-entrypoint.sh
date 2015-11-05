@@ -8,6 +8,7 @@ set -e
 # build on host.
 chown -R build:build /home/build
 chown -R build:build /usr/src
+chown -R build:build /mnt/build
 
 if [ "$1" = '/jenkins-child-start.sh' ]; then
 	echo "Entry script"

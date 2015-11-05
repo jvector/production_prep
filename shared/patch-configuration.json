@@ -1,0 +1,7 @@
+{
+	"BUILDFS_LOCATION": "/mnt/build/patches",
+	"SMOOTHWALL_METADATA_REPO": "gerrit:deb/smoothwall-metadata",
+	"PATCHGEN_COMMAND": "patchgen/patchgen",
+	"LOGGER_COMMAND" : "logging/project-logger",
+	"DEFAULT_ARCH" : "amd64"
+}
