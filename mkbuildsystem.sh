@@ -24,6 +24,7 @@ fi
 function setup_config {
 	generate_keys
 	genesis_config
+	hooks_config
 }
 
 function copy_into_local {

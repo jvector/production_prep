@@ -426,3 +426,14 @@ function genesis_config {
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
 }
+
+function hooks_config {
+sed -i -e "\
+/use constant GERRIT =>/c \
+use constant GERRIT => '${GERRIT_NAME}'; # our container gerrit hostname
+/use constant JENKINS =>/c \
+use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/'; # url for jenkins container
+/use constant BUGZILLA_SERVER =>/c \
+use constant BUGZILLA_SERVER => 'bugzilla'; # our container bugzilla \
+" shared_src/buildsystem/gerrithooks/GerritHooks.pm
+}
