@@ -4,15 +4,11 @@
 FROM debian:jessie
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
-# Defaults to bugzilla.container.smoothwall.com unless defined @ buildtime
-ARG BUGZILLA_USER
+# Defaults to bugzilla unless defined @ buildtime
 ARG BUGZILLA_HOSTNAME=bugzilla
 ARG BUGZILLA_ROOT
 
-ENV BUGZILLA_USER ${BUGZILLA_USER:-bugzilla}
 ENV BUGZILLA_ROOT ${BUGZILLA_ROOT:-/var/www/$BUGZILLA_HOSTNAME}
-
-#RUN useradd -m -d "$BUGZILLA_ROOT" -U $BUGZILLA_USER
 
 # Accept build time arguments
 # We don't carry these into the environment, set them at build
@@ -31,9 +27,9 @@ ARG WEB_SERVER_GROUP
 # Set env's to build time arguments or defaults if not supplied
 # Can also be changed at run time using -e DB_DRIVER=<new_value>
 ENV ADMIN_EMAIL=${ADMIN_EMAIL:-admin@bugzilla.com} \
-	ADMIN_PASSWORD=${ADMIN_PASSWORD:-1234} \
+	ADMIN_PASSWORD=${ADMIN_PASSWORD:-123456} \
 	DB_DRIVER=${DB_DRIVER:-pg} \
-	DB_HOST=${DB_HOST:-pg-gerrit} \
+	DB_HOST=${DB_HOST:-pg-bugzilla} \
 	DB_PORT=${DB_PORT:-0} \
 	DB_NAME=${DB_NAME:-bugs} \
 	DB_USER=${DB_USER:-bugs} \
@@ -68,8 +64,12 @@ RUN mkdir /docker-entrypoint-init.d
 
 COPY docker-entrypoint.sh /
 COPY bugzilla-start.sh /
+COPY bugzilla-secret-password.sh /
+COPY apache_setup.sh /docker-entrypoint-init.d
+
+# DEV ONLY REMOVE BEFORE releases
+RUN apt-get update && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
 CMD [ "/bugzilla-start.sh" ]
-#COPY localconfig $BUGZILLA_ROOT/localconfig

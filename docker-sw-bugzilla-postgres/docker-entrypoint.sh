@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ -e /bugzilla-secret-password.sh ]; then
+    source /bugzilla-secret-password.sh
+fi
+
 set_listen_addresses() {
 	sedEscapedValue="$(echo "$1" | sed 's/[\/&]/\\&/g')"
 	sed -ri "s/^#?(listen_addresses\s*=\s*)\S+/\1'$sedEscapedValue'/" "$PGDATA/postgresql.conf"
@@ -44,7 +48,7 @@ if [ "$1" = 'postgres' ]; then
 
 		{ echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA/pg_hba.conf"
 
-		# internal start of server in order to allow set-up using psql-client		
+		# internal start of server in order to allow set-up using psql-client
 		# does not listen on TCP/IP and waits until start finishes
 		gosu postgres pg_ctl -D "$PGDATA" \
 			-o "-c listen_addresses=''" \
@@ -71,12 +75,15 @@ if [ "$1" = 'postgres' ]; then
 			$op USER "$POSTGRES_USER" WITH SUPERUSER $pass ;
 		EOSQL
 		echo
-		
+
+		gosu postgres psql --command "CREATE USER bugs WITH PASSWORD '$DB_PASS';" && \
+		gosu postgres createdb -E UTF-8 -O bugs bugs
+
 		echo
 		for f in /docker-entrypoint-initdb.d/*; do
 			case "$f" in
 				*.sh)  echo "$0: running $f"; . "$f" ;;
-				*.sql) echo "$0: running $f"; psql --username "gerrit2" --dbname "reviewdb" < "$f" && echo ;;
+				*.sql) echo "$0: running $f"; psql --username "bugs" --dbname "bugs" < "$f" && echo ;;
 				*)     echo "$0: ignoring $f" ;;
 			esac
 			echo

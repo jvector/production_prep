@@ -7,7 +7,7 @@ fi
 
 if [ "$1" = "/bugzilla-start.sh" ]; then
     echo "First time initialize bugzilla.."
-    chown -R $BUGZILLA_USER $BUGZILLA_ROOT
+    chown -R $WEB_SERVER_GROUP:$WEB_SERVER_GROUP $BUGZILLA_ROOT
 
     cat <<EOF > /checksetup_answers.txt
         \$answer{'ADMIN_EMAIL'} = '$ADMIN_EMAIL'; 
