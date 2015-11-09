@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-if [ -e /bugzilla-secret-password.sh ]; then
-    source /bugzilla-secret-password.sh
+if [ -e /bugzilla-pg-password.sh ]; then
+    source /bugzilla-pg-password.sh
 fi
 
 set_listen_addresses() {
@@ -83,7 +83,7 @@ if [ "$1" = 'postgres' ]; then
 		for f in /docker-entrypoint-initdb.d/*; do
 			case "$f" in
 				*.sh)  echo "$0: running $f"; . "$f" ;;
-				*.sql) echo "$0: running $f"; psql --username "bugs" --dbname "bugs" < "$f" && echo ;;
+                *.sql) echo "$0: running $f"; psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" < "$f" && echo ;;
 				*)     echo "$0: ignoring $f" ;;
 			esac
 			echo

@@ -16,9 +16,11 @@ source container_functions.sh
 
 function stop_containers {
 	rm_jenkins
-	rm_postgres
+	rm_pg_gerrit
 	rm_gerrit
 	rm_redis
+	rm_pg_bugzilla
+	rm_bugzilla
 	rm_docker_network
 }
 
@@ -36,6 +38,8 @@ function rm_local_copies {
 	rm_gnupg
 	rm_apt-keys
 	rm_shared_jenkins
+	rm_shared_bugzilla
+	rm_shared_db_conf
 }
 
 stop_containers

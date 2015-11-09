@@ -1,8 +1,8 @@
 #!/bin/bash
 # Copyright Smoothwall Ltd 2015
 
-if [ -e /bugzilla-secret-password.sh ]; then
-    source /bugzilla-secret-password.sh
+if [ -e /bugzilla-pg-password.sh ]; then
+    source /bugzilla-pg-password.sh
 fi
 
 if [ "$1" = "/bugzilla-start.sh" ]; then

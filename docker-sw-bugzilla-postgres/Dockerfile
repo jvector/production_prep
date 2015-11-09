@@ -10,11 +10,11 @@ ENV LANG en_GB.utf8
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # From sbuild-secrets
-COPY bugzilla-secret-password.sh /
+COPY bugzilla-pg-password.sh /
 
 ENV ENTRYPOINT /docker-entrypoint-initdb.d
 
-COPY bugzilla-postgresql.conf ${ENTRYPOINT}/conf/bugzilla-postgresql.conf
+COPY postgresql.conf ${ENTRYPOINT}/conf/postgresql.conf
 COPY config.sh ${ENTRYPOINT}/config.sh
 
 COPY bugs_backup.sql ${ENTRYPOINT}/bugs_backup.sql

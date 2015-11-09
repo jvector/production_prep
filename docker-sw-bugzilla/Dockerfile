@@ -57,14 +57,13 @@ RUN wget http://ftp.mozilla.org/pub/mozilla.org/webtools/bugzilla-5.0.1.tar.gz \
 	&& mkdir -p $BUGZILLA_ROOT \
 	&& tar -xzf bugzilla-5.0.1.tar.gz -C $BUGZILLA_ROOT --strip-components=1 \
 	&& rm bugzilla-5.0.1.tar.gz
-	# && chown -Rf www-data:www-data $BUGZILLA_ROOT
 
 # All *.sh placed in this directory will be ran
 RUN mkdir /docker-entrypoint-init.d
 
 COPY docker-entrypoint.sh /
 COPY bugzilla-start.sh /
-COPY bugzilla-secret-password.sh /
+COPY bugzilla-pg-password.sh /
 COPY apache_setup.sh /docker-entrypoint-init.d
 
 # DEV ONLY REMOVE BEFORE releases
