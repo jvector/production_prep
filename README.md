@@ -17,6 +17,9 @@ There are the following things needed to get it to work:
 
 * Copy in **/srv/build/logs** from buildfs to shared_mnt_build/logs \**not essential, build will still succeed without this but project-logger wont work\**
 
+* docker-sw-bugzilla-postgres needs a copy of **live dbdump** saved as
+docker-sw-bugzilla-postgres/bugs_backup.sql
+
 * Lastly you will need to copy (or generate via genesis) the relevant **jobs to match your git(s) & project(s)** into your mounted jenkins/jobs location
 
 #### To bring up the Containers 
@@ -40,6 +43,7 @@ This will create some folders on host as per the defaults file used by the Conta
 * **MNTBUILD_DATA** - Stores a shared /mnt/build between containers
 * **APTLY_DATA** - Stores a shared /usr/src/aptly between containers
 * **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
+* **PG_BUGZILLA_DATA** - Stores Postgresql Database used by Bugzilla
 
 #### To remove the Containers
 Run ./rmbuildsystem.sh

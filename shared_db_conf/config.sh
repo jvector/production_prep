@@ -1,8 +1,6 @@
 #!/bin/bash
 # Copyright Smoothwall Ltd 2015
 
-#find / -name "postgresql.conf"
-
 CONFIG_DIR=/var/lib/postgresql/data
 SERVER_CONFIG=${CONFIG_DIR}/postgresql.conf
 ENTRYPOINT=/docker-entrypoint-initdb.d/conf
@@ -10,4 +8,4 @@ ENTRYPOINT=/docker-entrypoint-initdb.d/conf
 # Smoothwall modifications to PostgreSQL
 sed -i '/^#include_dir.*/s/^#//' ${SERVER_CONFIG}
 mkdir ${CONFIG_DIR}/conf.d
-cp ${ENTRYPOINT}/gerrit-postgresql.conf ${CONFIG_DIR}/conf.d/gerrit-postgresql.conf
+cp ${ENTRYPOINT}/postgresql.conf ${CONFIG_DIR}/conf.d/postgresql.conf
