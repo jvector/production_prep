@@ -31,6 +31,8 @@ function copy_into_local {
 	copy_gnupg
 	copy_apt-keys
 	copy_shared_jenkins
+	copy_shared_bugzilla
+	copy_shared_db_conf
 }
 
 function copy_into_mounts {
@@ -43,17 +45,21 @@ function copy_into_mounts {
 }
 
 function build_images {
-	build_postgres
+	build_pg_gerrit
 	build_gerrit
 	build_jenkins
+	build_pg_bugzilla
+	build_bugzilla
 }
 
 function start_containers {
 	create_docker_network
 	start_jenkins
-	start_postgres
+	start_pg_gerrit
 	start_redis
 	start_gerrit
+	start_pg_bugzilla
+	start_bugzilla
 }
 
 setup_config

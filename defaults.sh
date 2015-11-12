@@ -21,3 +21,4 @@ DEVMETADATA_DATA=${BUILD_HOME:-$HOME}/dev-metadata-test/
 MNTBUILD_DATA=${BUILD_HOME:-$HOME}/mnt-build-test/
 APTLY_DATA=${BUILD_HOME:-$HOME}/aptly-test/
 GERRIT_GIT_DATA=${BUILD_HOME:-$HOME}/gerrit-git-data/
+PG_BUGZILLA_DATA=${BUILD_HOME:-$HOME}/pg-bugzilla-test

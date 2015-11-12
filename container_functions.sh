@@ -18,7 +18,7 @@ fi
 # Docker Network
 DOCKER_NETWORK=${DOCKER_NETWORK:-buildsystem}
 
-# PostgreSQL
+# PostgreSQL Gerrit
 PG_GERRIT_IMAGE=${PG_GERRIT_IMAGE:-sw/gerrit-postgres}
 PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit}
 PG_GERRIT_DATA=${PG_GERRIT_DATA:-/var/lib/containers/${PG_GERRIT_IMAGE}}
@@ -46,6 +46,15 @@ JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
 JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-localhost}
 SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
+
+# Bugzilla
+BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
+BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
+
+# PostgreSQL Bugzilla
+PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
+PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
+PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
@@ -167,14 +176,14 @@ function rm_jenkins {
 #    sudo rm -rf ${JENKINS_DATA}
 }
 
-### PostgreSQL
-function build_postgres {
+### PostgreSQL Gerrit
+function build_pg_gerrit {
   docker build -t ${PG_GERRIT_IMAGE} docker-sw-gerrit-postgres || \
          fail "Building image ${PG_GERRIT_IMAGE} failed"
 }
 
-function start_postgres {
-  echo "Starting PostgreSQL ..."
+function start_pg_gerrit {
+  echo "Starting PostgreSQL Gerrit..."
   
   # Kept in secrets git
   source docker-sw-gerrit/pg-gerrit-password.sh
@@ -199,10 +208,10 @@ function start_postgres {
     echo "(still waiting)"
   done
 sleep 30
-  echo "PostgreSQL container ${PG_GERRIT_NAME} running."
+  echo "PostgreSQL Gerrit container ${PG_GERRIT_NAME} running."
 }
 
-function rm_postgres {
+function rm_pg_gerrit {
   docker stop ${PG_GERRIT_NAME}
   docker rm -v ${PG_GERRIT_NAME}
   sudo rm -rf ${PG_GERRIT_DATA}
@@ -221,9 +230,9 @@ function start_redis {
         -d ${REDIS_IMAGE}
 
     echo "Waiting for redis to boot..."
-    echo "(This should take about 10s)"
+    echo "(This should take about 5s)"
     while [ -z "$(docker logs ${REDIS_NAME} 2>&1 | grep 'ready to accept connections on port 6379')" ]; do
-      sleep 8
+      sleep 5
       echo "(still waiting)"
     done
     echo "Redis container ${REDIS_NAME} running."
@@ -274,6 +283,81 @@ function start_gerrit {
   #https://code.google.com/p/gerrit/issues/detail?id=1305
   # Got problems with init? See above ...
 
+}
+
+function rm_gerrit {
+  docker stop ${GERRIT_NAME}
+  docker rm -v ${GERRIT_NAME}
+  sudo rm -rf ${GERRIT_DATA}
+}
+
+### PostgreSQL Bugzilla
+function build_pg_bugzilla {
+    docker build -t ${PG_BUGZILLA_IMAGE} docker-sw-bugzilla-postgres || \
+           fail "Building image ${PG_BUGZILLA_IMAGE} failed"
+}
+
+function start_pg_bugzilla {
+    echo "Starting PostgreSQL Bugzilla ..."
+
+    # Kept in secrets git
+    source shared_bugzilla/bugzilla-pg-password.sh
+
+    docker run \
+        --name ${PG_BUGZILLA_NAME} \
+        -p 5433:5432 \
+        -v ${PG_BUGZILLA_DATA}:/var/lib/postgresql/data \
+        -e POSTGRES_USER=bugs \
+        -e POSTGRES_PASSWORD=$DB_PASS \
+        -e POSTGRES_DB=bugs \
+        --net=${DOCKER_NETWORK} \
+        -d ${PG_BUGZILLA_IMAGE}
+
+    # This actually only works the first time the container is spun up.
+    # When running this up with an existing data directory, it won't
+    # work.
+    echo "Waiting for the database to become ready ..."
+    echo "(This should take about 40s)"
+    while [ -z "$(docker logs ${PG_BUGZILLA_NAME} 2>&1 | grep 'PostgreSQL init process complete; ready for start up')" ]; do
+        sleep 8
+        echo "(still waiting)"
+    done
+    echo "PostgreSQL Bugzilla container ${PG_BUGZILLA_NAME} running."
+}
+
+function rm_pg_bugzilla {
+  docker stop ${PG_BUGZILLA_NAME}
+  docker rm -v ${PG_BUGZILLA_NAME}
+  sudo rm -rf ${PG_BUGZILLA_DATA}
+}
+
+function build_bugzilla {
+    docker build -t ${BUGZILLA_IMAGE} docker-sw-bugzilla || \
+            fail "Building image ${BUGZILLA_IMAGE} failed"
+}
+
+function start_bugzilla {
+    echo "Starting Bugzilla..."
+    docker run \
+        --name ${BUGZILLA_NAME} \
+        -p 8888:80 \
+        -e DB_HOST=${PG_BUGZILLA_NAME} \
+        --net=${DOCKER_NETWORK} \
+        -d ${BUGZILLA_IMAGE}
+        
+    echo "Waiting for Bugzilla to boot..."
+    echo "(This should take about 20s)"
+    # FIXME: If we ever set a fully qualified domain name this needs to be changed.
+    while [ -z "$(docker logs ${BUGZILLA_NAME} 2>&1 | grep 'directive globally to suppress this message')" ]; do
+      sleep 8
+      echo "(still waiting)"
+    done
+    echo "Bugzilla container ${BUGZILLA_NAME} running."
+}
+
+function rm_bugzilla {
+    docker stop ${BUGZILLA_NAME}
+    docker rm ${BUGZILLA_NAME}
 }
 
 function rm_gerrit {
@@ -410,10 +494,50 @@ function rm_shared_jenkins {
     done
 }
 
+# Copy shared_bugzilla into the build context of bugzilla and pg-bugzilla
+function copy_shared_bugzilla {
+    for DEST in docker-sw-bugzilla \
+                docker-sw-bugzilla-postgres \
+                ;
+    do
+        cp -ar shared_bugzilla/* $DEST
+    done
+}
+
+# Remove local copy of shared_bugzilla from bugzilla & pg-bugzilla's build context
+function rm_shared_bugzilla {
+    for FILE in shared_bugzilla/*
+    do
+        rm -rf docker-sw-bugzilla/$FILE
+        rm -rf docker-sw-bugzilla-postgres/$FILE
+    done
+}
+
+# Copy shared_db_conf to the database containers, pg-gerrit and pg-bugzilla
+function copy_shared_db_conf {
+    for DEST in docker-sw-gerrit-postgres \
+                docker-sw-bugzilla-postgres \
+                ;
+    do
+        cp -ar shared_db_conf/* $DEST
+    done
+}
+
+# Remove local copy of shared_db_conf from pg-gerrit and pg-bugzilla
+function rm_shared_db_conf {
+    for FILE in shared_db_conf/*
+    do
+        rm -rf docker-sw-gerrit-postgres/$FILE
+        rm -rf docker-sw-bugzilla-postgres/$FILE
+    done
+}
+
+# Copies our local copy of gerrit gits into the mounted fs for /usr/src/gerrit
 function copy_into_gerrit_gits {
     cp -ar shared_gits ${GERRIT_GIT_DATA}
 }
 
+# Clears the mounted fs for /usr/src/gerrit
 function rm_from_gerrit_gits {
     sudo rm -rf ${GERRIT_GIT_DATA}
 }
