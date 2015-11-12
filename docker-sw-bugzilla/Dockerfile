@@ -66,6 +66,9 @@ COPY bugzilla-start.sh /
 COPY bugzilla-pg-password.sh /
 COPY apache_setup.sh /docker-entrypoint-init.d
 
+# Copy in script to add Smoothwall-isms to specific Templates
+COPY modify_templates.sh /docker-entrypoint-init.d
+
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
 
