@@ -264,6 +264,7 @@ function start_gerrit {
     -v ${GERRIT_GIT_DATA}:/usr/src/gerrit \
     -p 29418:29418 \
     -p 8080:8080 \
+	-p 8081:80 \
     -e WEBURL=${GERRIT_WEBURL} \
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \
@@ -557,12 +558,11 @@ function genesis_config {
 # is not dependably a single space
 
 function hooks_config {
-sed -i -e "\
-/use constant GERRIT /c \ 
-use constant GERRIT => '${GERRIT_NAME}'; # our container gerrit hostname
+sed -i -e "/use constant GERRIT /c \
+use constant GERRIT => '${GERRIT_NAME}';
 /use constant JENKINS /c \
-use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/'; # url for jenkins container
+use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/';
 /use constant BUGZILLA_SERVER /c \
-use constant BUGZILLA_SERVER => 'bugzilla'; # our container bugzilla \
+use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
 " shared_src/buildsystem/gerrithooks/GerritHooks.pm
 }
