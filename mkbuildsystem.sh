@@ -23,8 +23,7 @@ fi
 
 function setup_config {
 	generate_keys
-	genesis_config
-	hooks_config
+	patch_buildsystem_references
 }
 
 function copy_into_local {

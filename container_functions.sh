@@ -50,11 +50,31 @@ SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
 BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
+ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
 PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
 PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
+
+# Gitweb runs on gerrit:80 (internal port)
+GITWEB_NAME=${GERRIT_NAME}
+
+# URL for Repository file server -- NOT YET IMPLEMENTED!
+
+REPO_NAME=${REPO_NAME:-undefined.fixplease_repo.soton.smoothwall.net}
+
+
+########### Urls on buildfs, which we will probably run in a dedicated
+########### container
+
+ISOGEN_NAME=${ISOGEN_NAME:-buildfs.TBA_isogen.soton.smoothwall.net}
+BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs.TBA_buildlogs.soton.smoothwall.net}
+
+# This will be used in releasegen as the public facing repository
+# (currently repo.smoothwall.net)
+PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
+PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
@@ -344,6 +364,7 @@ function start_bugzilla {
         -p 8888:80 \
         -e DB_HOST=${PG_BUGZILLA_NAME} \
         --net=${DOCKER_NETWORK} \
+		-e ADMIN_EMAIL=${ADMIN_EMAIL} \
         -d ${BUGZILLA_IMAGE}
         
     echo "Waiting for Bugzilla to boot..."
@@ -543,26 +564,97 @@ function rm_from_gerrit_gits {
     sudo rm -rf ${GERRIT_GIT_DATA}
 }
 
-function genesis_config {
+# Find the definitions of these params in the gerrit hooks code and
+# patch them on the fly. Beware, there is a JENKINS_CLI var we don't
+# want to disturb, and also the white space between 'use FOO' and '=>'
+# is not dependably a single space.
+
+function patch_gerrit_hooks {
+	sed -i -e "/use constant GERRIT /c \
+	use constant GERRIT => '${GERRIT_NAME}';
+	/use constant JENKINS /c \
+	use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/';
+	/use constant BUGZILLA_SERVER /c \
+	use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
+	/use constant GITWEB /c \
+	use constant GITWEB => 'http://${GITWEB_NAME}';
+	" shared_src/buildsystem/gerrithooks/GerritHooks.pm
+
+	sed -i -e "s/bugzilla.soton.smoothwall.net/${BUGZILLA_NAME}/;" \
+		shared_src/buildsystem/gerrithooks/bugzilla-connection-test.pl
+
+}
+
+function patch_genesis_refs {
     sed -e "s/@JENKINS_MASTER@/${JENKINS_MASTER_NAME}/" \
     -e "s/@JENCHILD1@/${JENKINS_CHILD1_NAME}/" \
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
+	-e "s/@REPO_NAME@/${REPO_NAME}/" \
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
+
+	sed -i \
+		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
+		-e "s/isogen.soton.smoothwall.net/${ISOGEN_NAME}/g" \
+		-e "s/buildlogs.soton.smoothwall.net/${BUILDLOGS_NAME}/g" shared_src/buildsystem/genesis/genesis	
 }
 
-# find the definitions of these params in the gerrit hooks code and
-# patch them on the fly. Beware, there is a JENKINS_CLI var we don't
-# want to disturb, and also the white space between 'use FOO' and '=>'
-# is not dependably a single space
+function patch_project_logger_refs {
+	for NAME in jenkins isogen gitweb bugzilla; do
+		UPPER=$(echo $NAME|tr [a-z] [A-Z])               # eg JENKINS
+		UPPER_NAME=${UPPER}_NAME                         # eg JENKINS_NAME
+		sed -i -e "s/${NAME}.soton.smoothwall.net/${UPPER_NAME}/" \
+			shared_src/buildsystem/logging/project-logger
+	done
+}
 
-function hooks_config {
-sed -i -e "/use constant GERRIT /c \
-use constant GERRIT => '${GERRIT_NAME}';
-/use constant JENKINS /c \
-use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/';
-/use constant BUGZILLA_SERVER /c \
-use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
-" shared_src/buildsystem/gerrithooks/GerritHooks.pm
+function patch_buildsystem_lib_files {
+	for FILE in DebianRepository.pm PatchGen.pm; do
+		sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g" \
+			shared_src/buildsystem/lib/SmoothWall/Build/$FILE
+	done
+}
+
+function patch_misc_repo_configs {
+
+	sed -i -e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g;" shared_src/buildsystem/aptly/aptly.conf
+	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/partnernet/vb_clone_vm
+	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/repodiff
+	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/find-desyncs
+	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/distdiff.pl
+}
+
+
+# REPO_NAME is the internal pkg repository (/usr/src/repository on gerrit)
+# PUB_REPO_HOST is the public facing repo server that provides customer updates
+
+function patch_releasegen_refs {
+	sed -i \
+		-e "s/repo.soton.smoothwall.net/${REPO_NAME}/g" \
+		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
+		-e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g" \
+		-e "s/partner.smoothwall.net/${PARTNERNET_HOST}/" shared_src/buildsystem/buildsystem/releasegen
+}
+
+
+function patch_misc_gerrit_configs {
+	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/find-desyncs
+	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/swprojswitch
+	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/debian-workstation-configuration.sh
+	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/smoothwall-workstation/bootstrap-workstation.sh
+}
+
+########################################
+# Uber script to edit occurrences of 'xxxxx.soton.smoothwall.net' in
+# build system scripts
+
+function patch_buildsystem_references {
+	patch_gerrit_hooks          || fail "patch_gerrit_hooks failed"
+	patch_genesis_refs          || fail "patch_genesis_refs failed"
+	patch_misc_repo_configs     || fail "patch_misc_repo_configs failed"
+	patch_misc_gerrit_configs   || fail "patch_misc_gerrit_configs failed"
+	patch_releasegen_refs       || fail "patch_releasegen_refs failed"
+	patch_buildsystem_lib_files || fail "patch_buildsystem_lib_files failed"
+	patch_project_logger_refs   || fail "patch_project_logger_ref"
 }
