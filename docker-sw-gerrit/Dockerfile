@@ -17,6 +17,8 @@ ENV GERRIT_INIT_ARGS \
 # as made by the initial generate_keys step of the mkbuildsystem script
 
 RUN apt-get update && apt-get -y -q install \
+    sudo \
+    libredis-perl \
     openssh-server \
     lighttpd \
     ntpdate \
@@ -46,6 +48,10 @@ COPY pg-gerrit-password.sh /pg-gerrit-password.sh
 COPY gerrit-start.sh /gerrit-start.sh
     # Global repo signing keys
 COPY apt-keys /var/lib/sbuild/apt-keys
+    # Ssh config for gerrit2
+COPY ssh_config /var/gerrit/.ssh/config
+	# Extra's
+COPY sudo.txt /sudo.txt
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also

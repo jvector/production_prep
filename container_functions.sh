@@ -573,7 +573,7 @@ function patch_gerrit_hooks {
 	sed -i -e "/use constant GERRIT /c \
 	use constant GERRIT => '${GERRIT_NAME}';
 	/use constant JENKINS /c \
-	use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:9000/';
+	use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:8080/';
 	/use constant BUGZILLA_SERVER /c \
 	use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
 	/use constant GITWEB /c \
@@ -617,14 +617,12 @@ function patch_buildsystem_lib_files {
 }
 
 function patch_misc_repo_configs {
-
 	sed -i -e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g;" shared_src/buildsystem/aptly/aptly.conf
 	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/partnernet/vb_clone_vm
-	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/repodiff
-	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/find-desyncs
-	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/distdiff.pl
+    for FILE in repodiff find-desyncs distdiff.pl; do
+    	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/$FILE
+    done
 }
-
 
 # REPO_NAME is the internal pkg repository (/usr/src/repository on gerrit)
 # PUB_REPO_HOST is the public facing repo server that provides customer updates
@@ -637,11 +635,10 @@ function patch_releasegen_refs {
 		-e "s/partner.smoothwall.net/${PARTNERNET_HOST}/" shared_src/buildsystem/buildsystem/releasegen
 }
 
-
 function patch_misc_gerrit_configs {
-	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/find-desyncs
-	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/swprojswitch
-	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/debian-workstation-configuration.sh
+    for FILE in find-desyncs swprojswitch debian-workstation-configuration.sh; do
+        sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/$FILE
+    done
 	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/smoothwall-workstation/bootstrap-workstation.sh
 }
 
@@ -657,4 +654,12 @@ function patch_buildsystem_references {
 	patch_releasegen_refs       || fail "patch_releasegen_refs failed"
 	patch_buildsystem_lib_files || fail "patch_buildsystem_lib_files failed"
 	patch_project_logger_refs   || fail "patch_project_logger_ref"
+}
+
+function fix_change_merged_for_new_gerrit {
+    sed -i -e "/our \$change_owner/a \
+            our \$newrev; " \
+        -e "/'change-owner=s'/i \
+            'newrev=s'," \
+        shared_src/buildsystem/gerrithooks/change-merged
 }

@@ -24,6 +24,7 @@ fi
 function setup_config {
 	generate_keys
 	patch_buildsystem_references
+	fix_change_merged_for_new_gerrit
 }
 
 function copy_into_local {

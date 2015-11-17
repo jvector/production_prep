@@ -77,8 +77,6 @@ COPY config_files/ ${JENKINS_HOME}
 	#Scripts
 COPY scripts/ /scripts
 COPY jenkins-start.sh /
-	# Extra's
-COPY sudo.txt /sudo.txt
 	# Copy in Chroots
 	# FIXME: Should be just copy all chroots in/mount them. For now we just have 
 	# a few to test with, as the full set is ~100GB

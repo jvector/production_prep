@@ -35,10 +35,6 @@ fi
 gosu ${USER} sed -i -e "s/@SYSADMINMAIL@/$SYSADMINMAIL/" \
                         /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
 
-# Integration
-# Add a few extra's to sudo
-cat /sudo.txt >> /etc/sudoers
-
 # Create a convenience symlink for debootstrap script
 ln -s /usr/src/buildsystem/templates/debootstrap-smoothwall /usr/share/debootstrap/scripts/smoothwall
 
