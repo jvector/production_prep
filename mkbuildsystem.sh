@@ -51,6 +51,7 @@ function build_images {
 	build_jenkins
 	build_pg_bugzilla
 	build_bugzilla
+	build_buildfs
 }
 
 function start_containers {
@@ -61,6 +62,7 @@ function start_containers {
 	start_gerrit
 	start_pg_bugzilla
 	start_bugzilla
+	start_buildfs
 }
 
 setup_config

@@ -40,6 +40,8 @@ JENKINS_MASTER_IMAGE=${JENKINS_MASTER_IMAGE:-sw/jenkins-master}
 JENKINS_CHILD_IMAGE=${JENKINS_CHILD_IMAGE:-sw/jenkins-child}
     # Names
 JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster}
+# For use in patch_project_logger_refs
+JENKINS_NAME=${JENKINS_MASTER_NAME}
 JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
     # Data
@@ -57,6 +59,10 @@ PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
 PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
 PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 
+# Buildfs / Lighttpd File server
+BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd}
+BUILDFS_NAME=${BUILDFS_NAME:-buildfs}
+
 # Gitweb runs on gerrit:80 (internal port)
 GITWEB_NAME=${GERRIT_NAME}
 
@@ -68,8 +74,8 @@ REPO_NAME=${REPO_NAME:-undefined.fixplease_repo.soton.smoothwall.net}
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
 
-ISOGEN_NAME=${ISOGEN_NAME:-buildfs.TBA_isogen.soton.smoothwall.net}
-BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs.TBA_buildlogs.soton.smoothwall.net}
+ISOGEN_NAME=${ISOGEN_NAME:-buildfs/isogen}
+BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs/logs}
 
 # This will be used in releasegen as the public facing repository
 # (currently repo.smoothwall.net)
@@ -382,6 +388,27 @@ function rm_bugzilla {
     docker rm ${BUGZILLA_NAME}
 }
 
+function build_buildfs {
+    docker build -t ${BUILDFS_IMAGE} docker-sw-lighttpd || \
+            fail "Building image ${BUILDFS_IMAGE} failedS"
+}
+
+function start_buildfs {
+    echo "Starting Buildfs..."
+    docker run \
+        --name ${BUILDFS_NAME} \
+        -p 6789:80 \
+        -v ${MNTBUILD_DATA}:/mnt/build \
+        --net=${DOCKER_NETWORK} \
+        -d ${BUILDFS_IMAGE}
+    echo "Buildfs container ${BUILDFS_NAME} running."
+}
+
+function rm_buildfs {
+    docker stop ${BUILDFS_NAME}
+    docker rm -v ${BUILDFS_NAME}
+}
+
 function rm_gerrit {
   docker stop ${GERRIT_NAME}
   docker rm -v ${GERRIT_NAME}
@@ -594,17 +621,19 @@ function patch_genesis_refs {
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
 
+    # ISOGEN_NAME and BUILDLOGS_NAME contain \'s, so use : for sed.
 	sed -i \
 		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
-		-e "s/isogen.soton.smoothwall.net/${ISOGEN_NAME}/g" \
-		-e "s/buildlogs.soton.smoothwall.net/${BUILDLOGS_NAME}/g" shared_src/buildsystem/genesis/genesis	
+		-e "s:isogen.soton.smoothwall.net:${ISOGEN_NAME}:g" \
+		-e "s:buildlogs.soton.smoothwall.net:${BUILDLOGS_NAME}:g" shared_src/buildsystem/genesis/genesis
 }
 
 function patch_project_logger_refs {
 	for NAME in jenkins isogen gitweb bugzilla; do
-		UPPER=$(echo $NAME|tr [a-z] [A-Z])               # eg JENKINS
-		UPPER_NAME=${UPPER}_NAME                         # eg JENKINS_NAME
-		sed -i -e "s/${NAME}.soton.smoothwall.net/${UPPER_NAME}/" \
+		TO_UPPER=$(echo $NAME|tr [a-z] [A-Z])               # eg JENKINS
+		eval VAR_NAME=\$${TO_UPPER}_NAME                        # eg JENKINS_NAME
+        # Isogen has a / in it, use : for sed
+		sed -i -e "s:${NAME}.soton.smoothwall.net:${VAR_NAME}:" \
 			shared_src/buildsystem/logging/project-logger
 	done
 }
