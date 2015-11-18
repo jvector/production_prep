@@ -21,6 +21,7 @@ function stop_containers {
 	rm_redis
 	rm_pg_bugzilla
 	rm_bugzilla
+	rm_buildfs
 	rm_docker_network
 }
 
