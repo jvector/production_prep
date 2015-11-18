@@ -472,7 +472,7 @@ function copy_into_mnt_build {
     # For now this just copies in log's to prevent (couldn't create dir x/y/z errors)
     # on build's. May have similar parts fall over without being initialised first,
     # expect to add as bumped into.
-    cp -ar shared_mnt_build/ $MNTBUILD_DATA
+    cp -a shared_mnt_build/. $MNTBUILD_DATA
 }
 
 # Clears the mounted fs for /mnt/build
