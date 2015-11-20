@@ -7,7 +7,7 @@ There are the following things needed to get it to work:
 
 * shared_src needs cloned into it: **buildsystem.git** and **dev-metadata.git**
 
-* docker-sw-gerrit/gits needs **All-Projects.git** and **All-Users.git** plus **any gits you want available** within the cbuildsystem
+* docker-sw-gerrit/gits needs **-- Standard Permissions --.git** *(Have fun copying that!)* **All-Projects.git** and **All-Users.git** plus **any gits you want available** within the cbuildsystem
 
 * docker-sw-gerrit-postgres needs a copy of the **live dbdump** saved as docker-sw-gerrit-postgres/gerrit_backup.sql
 

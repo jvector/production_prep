@@ -1,1 +1,3 @@
 gerrit_backup.sql
+postgresql.conf
+config.sh

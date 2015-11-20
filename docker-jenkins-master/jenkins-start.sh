@@ -21,6 +21,7 @@ chown -R ${USER}:${USER} /usr/src/repository
 						 -e "s/@JENCHILD2_HOST@/$JENCHILD2_HOSTNAME/" \
 						 -e "s/@JENCHILD1_EXECUTORS@/$JENCHILD1_EXECUTORS/" \
 						 -e "s/@JENCHILD2_EXECUTORS@/$JENCHILD2_EXECUTORS/" \
+                         -e "s#@BUILDLOG_ADDR@#$BUILDLOGS_URL#g" \
 						 /var/jenkins_home/config.xml
 
 # Configure x plugin .xml file
@@ -34,10 +35,6 @@ fi
 # Jenkins Location config
 gosu ${USER} sed -i -e "s/@SYSADMINMAIL@/$SYSADMINMAIL/" \
                         /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
-
-# Integration
-# Add a few extra's to sudo
-cat /sudo.txt >> /etc/sudoers
 
 # Create a convenience symlink for debootstrap script
 ln -s /usr/src/buildsystem/templates/debootstrap-smoothwall /usr/share/debootstrap/scripts/smoothwall

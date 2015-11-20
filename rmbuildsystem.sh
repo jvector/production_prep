@@ -21,6 +21,8 @@ function stop_containers {
 	rm_redis
 	rm_pg_bugzilla
 	rm_bugzilla
+	rm_buildfs
+	rm_internal_repo
 	rm_docker_network
 }
 
@@ -37,7 +39,7 @@ function rm_local_copies {
 	rm_shared_copies
 	rm_gnupg
 	rm_apt-keys
-	rm_shared_jenkins
+	rm_common_jenkins
 	rm_shared_bugzilla
 	rm_shared_db_conf
 }

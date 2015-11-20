@@ -1,0 +1,5 @@
+Host gerrit
+User build
+HostName 127.0.0.1
+Port 29418
+StrictHostKeyChecking No

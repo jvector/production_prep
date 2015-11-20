@@ -14,7 +14,7 @@ function set_secure_config {
 # Smoothwall specific settings
 # set_gerrit_config auth.trustedOpenID 'https://www.google.com/accounts/o8/id?id='
 # set_gerrit_config core.streamFileThreshold '100 m'
-# set_gerrit_config gitweb.url 'http://gitweb.newbs.soton.smoothwall.net/'
+# set_gerrit_config gitweb.url 'http://localhost/'
 set_gerrit_config gerrit.basePath '/usr/src/gerrit'
 # 
 # gosu ${GERRIT_USER} curl -L https://github.com/davido/gerrit-oauth-provider/releases/download/v0.3/gerrit-oauth-provider.jar -o ${GERRIT_SITE}/plugins/gerrit-oauth-provider.jar
@@ -33,7 +33,9 @@ ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/ho
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
 
 # Get the Jenkins CLI
-wget -P /var/gerrit/review_site http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
+wget -P /home/build http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
+chown build:build /home/build/jenkins-cli.jar
+
 chown -R  ${GERRIT_USER}:${GERRIT_USER} /var/gerrit/
 
 # This was previously handled via linking in pg-gerrit as db and specifying DATABASE_TYPE
@@ -58,3 +60,11 @@ gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
 #[commentlink "bugzilla"]
 #  match = "(bug\\s+#?)(\\d+)"
 #  link = http://bugzilla.soton.smoothwall.net/show_bug.cgi?id=$2
+
+# Integration
+# Add a few extra's to sudo
+cat /sudo.txt >> /etc/sudoers
+
+cp -a /etc_copy/* ${GERRIT_SITE}/etc
+
+service lighttpd start

@@ -40,8 +40,11 @@ JENKINS_MASTER_IMAGE=${JENKINS_MASTER_IMAGE:-sw/jenkins-master}
 JENKINS_CHILD_IMAGE=${JENKINS_CHILD_IMAGE:-sw/jenkins-child}
     # Names
 JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster}
+# For use in patch_project_logger_refs
+JENKINS_NAME=${JENKINS_MASTER_NAME}
 JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
+JENKINS_URL=${JENKINS_URL:-http://localhost:9000}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
 JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-localhost}
@@ -50,11 +53,39 @@ SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
 BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
+ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
+BUGZILLA_URL=${BUGZILLA_URL:-http://localhost:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
 PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
 PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
+
+# Buildfs / Lighttpd File server
+BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
+BUILDFS_NAME=${BUILDFS_NAME:-buildfs}
+BUILDFS_URL=${BUILDFS_URL:-http://localhost:6789}
+
+# Gitweb runs on gerrit:80 (internal port)
+GITWEB_NAME=${GERRIT_NAME}
+GITWEB_URL=${GITWEB_URL:-http://localhost:8081}
+
+# URL for Internal Repository / Lighttpd File server
+INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
+INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal_repo}
+INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://localhost:9876}
+
+########### Urls on buildfs, which we will probably run in a dedicated
+########### container
+
+ISOGEN_NAME=${ISOGEN_NAME:-buildfs/isogen}
+BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs/logs}
+BUILDLOGS_URL=${BUILDLOGS_URL:-http://localhost:6789/logs}
+
+# This will be used in releasegen as the public facing repository
+# (currently repo.smoothwall.net)
+PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
+PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
@@ -136,6 +167,7 @@ function start_jenkins {
         -e "JENCHILD2_HOSTNAME=${JENKINS_CHILD2_NAME}" \
         -e "JENCHILD1_EXECUTORS=2" \
         -e "JENCHILD2_EXECUTORS=2" \
+        -e "BUILDLOGS_URL=${BUILDLOGS_URL}" \
         --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
 
@@ -264,6 +296,7 @@ function start_gerrit {
     -v ${GERRIT_GIT_DATA}:/usr/src/gerrit \
     -p 29418:29418 \
     -p 8080:8080 \
+	-p 8081:80 \
     -e WEBURL=${GERRIT_WEBURL} \
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \
@@ -343,6 +376,7 @@ function start_bugzilla {
         -p 8888:80 \
         -e DB_HOST=${PG_BUGZILLA_NAME} \
         --net=${DOCKER_NETWORK} \
+		-e ADMIN_EMAIL=${ADMIN_EMAIL} \
         -d ${BUGZILLA_IMAGE}
         
     echo "Waiting for Bugzilla to boot..."
@@ -358,6 +392,54 @@ function start_bugzilla {
 function rm_bugzilla {
     docker stop ${BUGZILLA_NAME}
     docker rm ${BUGZILLA_NAME}
+}
+
+function build_buildfs {
+    docker build \
+        -t ${BUILDFS_IMAGE} \
+        --build-arg SERVER_ROOT=/mnt/build \
+        docker-sw-lighttpd || \
+    fail "Building image ${BUILDFS_IMAGE} failed"
+}
+
+function start_buildfs {
+    echo "Starting Buildfs..."
+    docker run \
+        --name ${BUILDFS_NAME} \
+        -p 6789:80 \
+        -v ${MNTBUILD_DATA}:/mnt/build \
+        --net=${DOCKER_NETWORK} \
+        -d ${BUILDFS_IMAGE}
+    echo "Buildfs container ${BUILDFS_NAME} running."
+}
+
+function rm_buildfs {
+    docker stop ${BUILDFS_NAME}
+    docker rm -v ${BUILDFS_NAME}
+}
+
+function build_internal_repo {
+    docker build \
+        -t ${INTERNAL_REPO_IMAGE} \
+        --build-arg SERVER_ROOT=/mnt/repository \
+        docker-sw-lighttpd || \
+    fail "Building image ${INTERNAL_REPO_IMAGE} failed"
+}
+
+function start_internal_repo {
+    echo "Starting Internal Repository.."
+    docker run \
+        --name ${INTERNAL_REPO_NAME} \
+        -p 9876:80 \
+        -v ${REPO_DATA}:/mnt/repository/smoothwall \
+        --net=${DOCKER_NETWORK} \
+        -d ${INTERNAL_REPO_IMAGE}
+    echo "Internal repository container ${INTERNAL_REPO_NAME} running."
+}
+
+function rm_internal_repo {
+    docker stop ${INTERNAL_REPO_NAME}
+    docker rm -v ${INTERNAL_REPO_NAME}
 }
 
 function rm_gerrit {
@@ -423,7 +505,7 @@ function copy_into_mnt_build {
     # For now this just copies in log's to prevent (couldn't create dir x/y/z errors)
     # on build's. May have similar parts fall over without being initialised first,
     # expect to add as bumped into.
-    cp -ar shared_mnt_build/ $MNTBUILD_DATA
+    cp -a shared_mnt_build/. $MNTBUILD_DATA
 }
 
 # Clears the mounted fs for /mnt/build
@@ -475,19 +557,19 @@ function rm_gnupg {
     rm -rf shared_home/build/.gnupg
 }
 
-# Copy shared_jenkins into the build context of master & children
-function copy_shared_jenkins {
+# Copy common_jenkins into the build context of master & children
+function copy_common_jenkins {
     for DEST in docker-jenkins-master \
                 docker-jenkins-child \
                 ;
     do
-        cp -ar shared_jenkins/* $DEST
+        cp -ar common_jenkins/* $DEST
     done
 }
 
-# Remove local copy of shared_jenkins from master & children's build context
-function rm_shared_jenkins {
-    for FILE in shared_jenkins/*
+# Remove local copy of common_jenkins from master & children's build context
+function rm_common_jenkins {
+    for FILE in common_jenkins/*
     do
         rm -rf docker-jenkins-master/$FILE
         rm -rf docker-jenkins-child/$FILE
@@ -534,7 +616,7 @@ function rm_shared_db_conf {
 
 # Copies our local copy of gerrit gits into the mounted fs for /usr/src/gerrit
 function copy_into_gerrit_gits {
-    cp -ar shared_gits ${GERRIT_GIT_DATA}
+    cp -ar mounted_gits ${GERRIT_GIT_DATA}
 }
 
 # Clears the mounted fs for /usr/src/gerrit
@@ -542,11 +624,116 @@ function rm_from_gerrit_gits {
     sudo rm -rf ${GERRIT_GIT_DATA}
 }
 
-function genesis_config {
+# Find the definitions of these params in the gerrit hooks code and
+# patch them on the fly. Beware, there is a JENKINS_CLI var we don't
+# want to disturb, and also the white space between 'use FOO' and '=>'
+# is not dependably a single space.
+
+function patch_gerrit_hooks {
+	sed -i -e "/use constant GERRIT /c \
+	use constant GERRIT => '${GERRIT_NAME}';
+	/use constant JENKINS /c \
+	use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:8080/';
+	/use constant BUGZILLA_SERVER /c \
+	use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
+	/use constant GITWEB /c \
+	use constant GITWEB => 'http://${GITWEB_NAME}';
+	" shared_src/buildsystem/gerrithooks/GerritHooks.pm
+
+	sed -i -e "s/bugzilla.soton.smoothwall.net/${BUGZILLA_NAME}/;" \
+		shared_src/buildsystem/gerrithooks/bugzilla-connection-test.pl
+
+}
+
+function patch_genesis_refs {
     sed -e "s/@JENKINS_MASTER@/${JENKINS_MASTER_NAME}/" \
     -e "s/@JENCHILD1@/${JENKINS_CHILD1_NAME}/" \
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
+	-e "s/@INTERNAL_REPO_NAME@/${INTERNAL_REPO_NAME}/" \
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
+
+    # ISOGEN_NAME and BUILDLOGS_NAME contain \'s, so use : for sed.
+	sed -i \
+		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
+		-e "s:isogen.soton.smoothwall.net:${ISOGEN_NAME}:g" \
+		-e "s:buildlogs.soton.smoothwall.net:${BUILDLOGS_NAME}:g" shared_src/buildsystem/genesis/genesis
+}
+
+function patch_project_logger_refs {
+	for NAME in jenkins isogen gitweb bugzilla; do
+		TO_UPPER=$(echo $NAME|tr [a-z] [A-Z])               # eg JENKINS
+		eval VAR_NAME=\$${TO_UPPER}_NAME                        # eg JENKINS_NAME
+        # Isogen has a / in it, use : for sed
+		sed -i -e "s:${NAME}.soton.smoothwall.net:${VAR_NAME}:" \
+			shared_src/buildsystem/logging/project-logger
+	done
+}
+
+function patch_buildsystem_lib_files {
+	for FILE in DebianRepository.pm PatchGen.pm; do
+		sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g" \
+			shared_src/buildsystem/lib/SmoothWall/Build/$FILE
+	done
+}
+
+function patch_misc_repo_configs {
+	sed -i -e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g;" shared_src/buildsystem/aptly/aptly.conf
+	sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g;" shared_src/buildsystem/partnernet/vb_clone_vm
+    for FILE in repodiff find-desyncs distdiff.pl; do
+        sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g;" shared_src/buildsystem/scripts/$FILE
+    done
+}
+
+# INTERNAL_REPO_NAME is the internal pkg repository (/usr/src/repository on gerrit)
+# PUB_REPO_HOST is the public facing repo server that provides customer updates
+
+function patch_releasegen_refs {
+	sed -i \
+		-e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g" \
+		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
+		-e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g" \
+		-e "s/partner.smoothwall.net/${PARTNERNET_HOST}/" shared_src/buildsystem/buildsystem/releasegen
+}
+
+function patch_misc_gerrit_configs {
+    for FILE in find-desyncs swprojswitch debian-workstation-configuration.sh; do
+        sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/scripts/$FILE
+    done
+	sed -i -e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" shared_src/buildsystem/smoothwall-workstation/bootstrap-workstation.sh
+}
+
+########################################
+# Uber script to edit occurrences of 'xxxxx.soton.smoothwall.net' in
+# build system scripts
+
+function patch_buildsystem_references {
+	patch_gerrit_hooks          || fail "patch_gerrit_hooks failed"
+	patch_genesis_refs          || fail "patch_genesis_refs failed"
+	patch_misc_repo_configs     || fail "patch_misc_repo_configs failed"
+	patch_misc_gerrit_configs   || fail "patch_misc_gerrit_configs failed"
+	patch_releasegen_refs       || fail "patch_releasegen_refs failed"
+	patch_buildsystem_lib_files || fail "patch_buildsystem_lib_files failed"
+	patch_project_logger_refs   || fail "patch_project_logger_ref"
+}
+
+function fix_change_merged_for_new_gerrit {
+    sed -i -e "/our \$change_owner/a \
+            our \$newrev; " \
+        -e "/'change-owner=s'/i \
+            'newrev=s'," \
+        shared_src/buildsystem/gerrithooks/change-merged
+}
+
+# While this may be unnecessary now, this allows us to do smart things
+# like ${JENKINS_PORT} or ${JENKINS_URL} at a later date.
+function patch_gerrit_site_header {
+    sed -e "s#@JENKINS@#${JENKINS_URL}#" \
+    -e "s#@BUGZILLA@#${BUGZILLA_URL}#" \
+    -e "s#@BUILDFS@#${BUILDFS_URL}#" \
+    -e "s#@INTERNAL_REPO@#${INTERNAL_REPO_URL}#" \
+	-e "s#@GITWEB@#${GITWEB_URL}#" \
+    docker-sw-gerrit/GerritSiteHeader.html.master \
+    > docker-sw-gerrit/GerritSiteHeader.html
 }

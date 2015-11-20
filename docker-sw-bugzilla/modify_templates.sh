@@ -3,7 +3,7 @@
 
 # Add our default template
 # Double backslashes to keep formatting the same and not put everything on one line
-sed -i -e "/\[% defaultcontent = BLOCK %\]/,/\[% INCLUDE bug\/comment.html.tmpl/ c \\
+sed -i -e "/\[% defaultcontent = BLOCK %\]/,/\[% comment FILTER none %\]/ c \\
 [% defaultcontent = BLOCK %\]\\
 [% IF cloned_bug_id %]\\
 +++ This [% terms.bug %] was initially created as a clone of [% terms.Bug %] #[% cloned_bug_id %] +++\\
@@ -54,9 +54,8 @@ sed -i -e "/\[% defaultcontent = BLOCK %\]/,/\[% INCLUDE bug\/comment.html.tmpl/
 \\
 [%-# We are within a BLOCK. The comment will be correctly HTML-escaped\\
 # by global/textarea.html.tmpl. So we must not escape the comment here. %]\\
-[% comment FILTER none %]\\
-[%- END %]\\
-[% INCLUDE bug/comment.html.tmpl" $BUGZILLA_ROOT/template/en/default/bug/create/create.html.tmpl
+[% comment FILTER none %]" \
+$BUGZILLA_ROOT/template/en/default/bug/create/create.html.tmpl
 
 
 # Change the font size for comments (Bugmail)
