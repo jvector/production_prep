@@ -393,8 +393,11 @@ function rm_bugzilla {
 }
 
 function build_buildfs {
-    docker build -t ${BUILDFS_IMAGE} docker-sw-lighttpd || \
-            fail "Building image ${BUILDFS_IMAGE} failedS"
+    docker build \
+        -t ${BUILDFS_IMAGE} \
+        --build-arg SERVER_ROOT=/mnt/build \
+        docker-sw-lighttpd || \
+    fail "Building image ${BUILDFS_IMAGE} failed"
 }
 
 function start_buildfs {
@@ -411,6 +414,30 @@ function start_buildfs {
 function rm_buildfs {
     docker stop ${BUILDFS_NAME}
     docker rm -v ${BUILDFS_NAME}
+}
+
+function build_internal_repo {
+    docker build \
+        -t ${INTERNAL_REPO_IMAGE} \
+        --build-arg SERVER_ROOT=/mnt/repository \
+        docker-sw-lighttpd || \
+    fail "Building image ${INTERNAL_REPO_IMAGE} failed"
+}
+
+function start_internal_repo {
+    echo "Starting Internal Repository.."
+    docker run \
+        --name ${INTERNAL_REPO_NAME} \
+        -p 9876:80 \
+        -v ${REPO_DATA}:/mnt/repository/smoothwall \
+        --net=${DOCKER_NETWORK} \
+        -d ${INTERNAL_REPO_IMAGE}
+    echo "Internal repository container ${INTERNAL_REPO_NAME} running."
+}
+
+function rm_internal_repo {
+    docker stop ${INTERNAL_REPO_NAME}
+    docker rm -v ${INTERNAL_REPO_NAME}
 }
 
 function rm_gerrit {
@@ -621,7 +648,7 @@ function patch_genesis_refs {
     -e "s/@JENCHILD1@/${JENKINS_CHILD1_NAME}/" \
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
-	-e "s/@REPO_NAME@/${REPO_NAME}/" \
+	-e "s/@INTERNAL_REPO_NAME@/${INTERNAL_REPO_NAME}/" \
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
 
@@ -644,25 +671,25 @@ function patch_project_logger_refs {
 
 function patch_buildsystem_lib_files {
 	for FILE in DebianRepository.pm PatchGen.pm; do
-		sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g" \
+		sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g" \
 			shared_src/buildsystem/lib/SmoothWall/Build/$FILE
 	done
 }
 
 function patch_misc_repo_configs {
 	sed -i -e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g;" shared_src/buildsystem/aptly/aptly.conf
-	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/partnernet/vb_clone_vm
+	sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g;" shared_src/buildsystem/partnernet/vb_clone_vm
     for FILE in repodiff find-desyncs distdiff.pl; do
-    	sed -i -e "s/repo.soton.smoothwall.net/${REPO_NAME}/g;" shared_src/buildsystem/scripts/$FILE
+        sed -i -e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g;" shared_src/buildsystem/scripts/$FILE
     done
 }
 
-# REPO_NAME is the internal pkg repository (/usr/src/repository on gerrit)
+# INTERNAL_REPO_NAME is the internal pkg repository (/usr/src/repository on gerrit)
 # PUB_REPO_HOST is the public facing repo server that provides customer updates
 
 function patch_releasegen_refs {
 	sed -i \
-		-e "s/repo.soton.smoothwall.net/${REPO_NAME}/g" \
+		-e "s/repo.soton.smoothwall.net/${INTERNAL_REPO_NAME}/g" \
 		-e "s/gerrit.soton.smoothwall.net/${GERRIT_NAME}/g" \
 		-e "s/repo.smoothwall.net/${PUB_REPO_HOST}/g" \
 		-e "s/partner.smoothwall.net/${PARTNERNET_HOST}/" shared_src/buildsystem/buildsystem/releasegen

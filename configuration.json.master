@@ -11,7 +11,7 @@
 	"VCS_REPO":       "/usr/src/gerrit/deb/",
 	"DEB_REPO":       "/usr/src/repository/",
 	"METADATA":       "/usr/src/dev-metadata/",
-	"REPO_URL":       "http://@REPO_NAME@/smoothwall",
+	"REPO_URL":       "http://@INTERNAL_REPO_NAME@/smoothwall",
 	"SCHROOT_CONFS":  "/etc/schroot/chroot.d/",
 	"SCHROOT_TARS":   "/srv/chroot/",
 	"SBUILD_CONFS":   "/etc/sbuild/chroot/",

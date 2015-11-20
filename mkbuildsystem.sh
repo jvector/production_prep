@@ -53,6 +53,7 @@ function build_images {
 	build_pg_bugzilla
 	build_bugzilla
 	build_buildfs
+	build_internal_repo
 }
 
 function start_containers {
@@ -64,6 +65,7 @@ function start_containers {
 	start_pg_bugzilla
 	start_bugzilla
 	start_buildfs
+	start_internal_repo
 }
 
 setup_config
