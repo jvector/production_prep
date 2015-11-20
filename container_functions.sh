@@ -80,6 +80,7 @@ INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://localhost:9876}
 
 ISOGEN_NAME=${ISOGEN_NAME:-buildfs/isogen}
 BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs/logs}
+BUILDLOGS_URL=${BUILDLOGS_URL:-http://localhost:6789/logs}
 
 # This will be used in releasegen as the public facing repository
 # (currently repo.smoothwall.net)
@@ -166,6 +167,7 @@ function start_jenkins {
         -e "JENCHILD2_HOSTNAME=${JENKINS_CHILD2_NAME}" \
         -e "JENCHILD1_EXECUTORS=2" \
         -e "JENCHILD2_EXECUTORS=2" \
+        -e "BUILDLOGS_URL=${BUILDLOGS_URL}" \
         --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
 
@@ -555,19 +557,19 @@ function rm_gnupg {
     rm -rf shared_home/build/.gnupg
 }
 
-# Copy shared_jenkins into the build context of master & children
-function copy_shared_jenkins {
+# Copy common_jenkins into the build context of master & children
+function copy_common_jenkins {
     for DEST in docker-jenkins-master \
                 docker-jenkins-child \
                 ;
     do
-        cp -ar shared_jenkins/* $DEST
+        cp -ar common_jenkins/* $DEST
     done
 }
 
-# Remove local copy of shared_jenkins from master & children's build context
-function rm_shared_jenkins {
-    for FILE in shared_jenkins/*
+# Remove local copy of common_jenkins from master & children's build context
+function rm_common_jenkins {
+    for FILE in common_jenkins/*
     do
         rm -rf docker-jenkins-master/$FILE
         rm -rf docker-jenkins-child/$FILE
@@ -614,7 +616,7 @@ function rm_shared_db_conf {
 
 # Copies our local copy of gerrit gits into the mounted fs for /usr/src/gerrit
 function copy_into_gerrit_gits {
-    cp -ar shared_gits ${GERRIT_GIT_DATA}
+    cp -ar mounted_gits ${GERRIT_GIT_DATA}
 }
 
 # Clears the mounted fs for /usr/src/gerrit
@@ -729,7 +731,7 @@ function fix_change_merged_for_new_gerrit {
 function patch_gerrit_site_header {
     sed -e "s#@JENKINS@#${JENKINS_URL}#" \
     -e "s#@BUGZILLA@#${BUGZILLA_URL}#" \
-    -e "s#@BUILDFS@#${BUILD_FS_URL}#" \
+    -e "s#@BUILDFS@#${BUILDFS_URL}#" \
     -e "s#@INTERNAL_REPO@#${INTERNAL_REPO_URL}#" \
 	-e "s#@GITWEB@#${GITWEB_URL}#" \
     docker-sw-gerrit/GerritSiteHeader.html.master \

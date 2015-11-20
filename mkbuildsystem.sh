@@ -32,7 +32,7 @@ function copy_into_local {
 	copy_shared
 	copy_gnupg
 	copy_apt-keys
-	copy_shared_jenkins
+	copy_common_jenkins
 	copy_shared_bugzilla
 	copy_shared_db_conf
 }
