@@ -44,6 +44,7 @@ JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster}
 JENKINS_NAME=${JENKINS_MASTER_NAME}
 JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
+JENKINS_URL=${JENKINS_URL:-http://localhost:9000}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
 JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-localhost}
@@ -53,6 +54,7 @@ SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
 BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
 ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
+BUGZILLA_URL=${BUGZILLA_URL:-http://localhost:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
@@ -60,16 +62,18 @@ PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
 PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 
 # Buildfs / Lighttpd File server
-BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd}
+BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
 BUILDFS_NAME=${BUILDFS_NAME:-buildfs}
+BUILDFS_URL=${BUILDFS_URL:-http://localhost:6789}
 
 # Gitweb runs on gerrit:80 (internal port)
 GITWEB_NAME=${GERRIT_NAME}
+GITWEB_URL=${GITWEB_URL:-http://localhost:8081}
 
-# URL for Repository file server -- NOT YET IMPLEMENTED!
-
-REPO_NAME=${REPO_NAME:-undefined.fixplease_repo.soton.smoothwall.net}
-
+# URL for Internal Repository / Lighttpd File server
+INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
+INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal_repo}
+INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://localhost:9876}
 
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
@@ -691,4 +695,16 @@ function fix_change_merged_for_new_gerrit {
         -e "/'change-owner=s'/i \
             'newrev=s'," \
         shared_src/buildsystem/gerrithooks/change-merged
+}
+
+# While this may be unnecessary now, this allows us to do smart things
+# like ${JENKINS_PORT} or ${JENKINS_URL} at a later date.
+function patch_gerrit_site_header {
+    sed -e "s#@JENKINS@#${JENKINS_URL}#" \
+    -e "s#@BUGZILLA@#${BUGZILLA_URL}#" \
+    -e "s#@BUILDFS@#${BUILD_FS_URL}#" \
+    -e "s#@INTERNAL_REPO@#${INTERNAL_REPO_URL}#" \
+	-e "s#@GITWEB@#${GITWEB_URL}#" \
+    docker-sw-gerrit/GerritSiteHeader.html.master \
+    > docker-sw-gerrit/GerritSiteHeader.html
 }

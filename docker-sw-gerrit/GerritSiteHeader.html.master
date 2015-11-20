@@ -1,0 +1,19 @@
+<div style="margin-left: 15px">
+<br />
+Please follow the 
+<a href="https://sites.google.com/a/smoothwall.net/devwiki/software-development/policies/code-review">
+Code Review processes
+</a>
+and
+<a href="https://sites.google.com/a/smoothwall.net/devwiki/development/policies">
+development policies
+</a><br/><br/>
+Quick Links: 
+<a href="@JENKINS@">Jenkins</a> | 
+<a href="@BUGZILLA@">Bugzilla</a> | 
+<a href="@BUILDFS@">Buildfs</a> | 
+<a href="@INTERNAL_REPO@">Internal_repo</a> | 
+<a href="@GITWEB@">Gitweb</a>
+<br /><br/>
+
+</div>

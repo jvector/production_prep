@@ -70,5 +70,7 @@ RUN /scripts/lighttpd_setup.sh
     # Setup gitweb
 RUN /scripts/gitweb_setup.sh
 
+COPY GerritSiteHeader.html /etc_copy/GerritSiteHeader.html
+
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get install -y vim && rm -rf /var/lib/apt/lists/*

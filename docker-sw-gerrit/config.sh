@@ -65,4 +65,6 @@ gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
 # Add a few extra's to sudo
 cat /sudo.txt >> /etc/sudoers
 
+cp -a /etc_copy/* ${GERRIT_SITE}/etc
+
 service lighttpd start
