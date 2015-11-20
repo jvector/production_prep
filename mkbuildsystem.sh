@@ -25,13 +25,14 @@ function setup_config {
 	generate_keys
 	patch_buildsystem_references
 	fix_change_merged_for_new_gerrit
+	patch_gerrit_site_header
 }
 
 function copy_into_local {
 	copy_shared
 	copy_gnupg
 	copy_apt-keys
-	copy_shared_jenkins
+	copy_common_jenkins
 	copy_shared_bugzilla
 	copy_shared_db_conf
 }
@@ -52,6 +53,7 @@ function build_images {
 	build_pg_bugzilla
 	build_bugzilla
 	build_buildfs
+	build_internal_repo
 }
 
 function start_containers {
@@ -63,6 +65,7 @@ function start_containers {
 	start_pg_bugzilla
 	start_bugzilla
 	start_buildfs
+	start_internal_repo
 }
 
 setup_config
