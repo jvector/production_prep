@@ -159,6 +159,7 @@ function start_jenkins {
         -v ${HOME_BUILD_DATA}:/home \
         -v ${MNTBUILD_DATA}:/mnt/build \
         -v ${APTLY_DATA}:/usr/src/aptly \
+        -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -p 9000:8080 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
@@ -190,6 +191,7 @@ function start_jenchild {
     -v ${HOME_BUILD_DATA}:/home \
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DATA}:/usr/src/aptly \
+    -v ${SRV_CHROOT_DATA}:/srv/chroot \
     --net=${DOCKER_NETWORK} \
     -d ${JENKINS_CHILD_IMAGE}
 }
@@ -294,6 +296,7 @@ function start_gerrit {
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DATA}:/usr/src/aptly \
     -v ${GERRIT_GIT_DATA}:/usr/src/gerrit \
+    -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -p 29418:29418 \
     -p 8080:8080 \
 	-p 8081:80 \
@@ -622,6 +625,18 @@ function copy_into_gerrit_gits {
 # Clears the mounted fs for /usr/src/gerrit
 function rm_from_gerrit_gits {
     sudo rm -rf ${GERRIT_GIT_DATA}
+}
+
+# Copies our local copy of Jenkin's chroots into the mounted fs for /src/chroot
+# Currently all Jenkin's nodes are on the same host, so only one location is mounted
+# between all three nodes, when on seperate nodes will need to change.
+function copy_into_srv_chroots {
+    cp -ar shared_chroots ${SRV_CHROOT_DATA}
+}
+
+# Clears the mounted fs for /src/chroot
+function rm_from_srv_chroots {
+    rm -rf ${SRV_CHROOT_DATA}
 }
 
 # Find the definitions of these params in the gerrit hooks code and

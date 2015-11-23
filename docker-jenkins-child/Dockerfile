@@ -70,10 +70,6 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& rm -Rf /root/pod2projdocs \
 	&& cd -
 
-# Copy in Chroots
-# FIXME: Should be just copy all chroots in/mount them. For now we just have 
-# a few to test with, as the full set is ~100GB
-COPY chroot/ /srv/chroot
 # Copy in Chroot config's
 # FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
 # on demand from live. For now we have copies of these files.
