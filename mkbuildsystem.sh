@@ -17,11 +17,14 @@ done
 
 source container_functions.sh
 
+LOGFILE=build.log
+
 if [ "$DEV" = 1 ]; then
 	echo "Dev mode activated"
 fi
 
 function setup_config {
+	echo "############# $(date )SET UP CONFIG ##############"
 	generate_keys
 	patch_buildsystem_references
 	fix_change_merged_for_new_gerrit
@@ -29,6 +32,7 @@ function setup_config {
 }
 
 function copy_into_local {
+	echo "############# $(date) COPY INTO LOCAL ##############"
 	copy_shared
 	copy_gnupg
 	copy_apt-keys
@@ -38,6 +42,7 @@ function copy_into_local {
 }
 
 function copy_into_mounts {
+	echo "############# $(date) COPY INTO MOUNTS ##############"
 	copy_into_repo
 	copy_into_shared_src
 	copy_into_shared_dev-metadata
@@ -47,16 +52,23 @@ function copy_into_mounts {
 }
 
 function build_images {
-	build_pg_gerrit
-	build_gerrit
-	build_jenkins
-	build_pg_bugzilla
-	build_bugzilla
-	build_buildfs
-	build_internal_repo
+	echo "############# $(date) build_pg_gerrit ##############"
+	build_pg_gerrit >> $LOGFILE
+	echo "############# $(date) build_gerrit ##############"
+	build_gerrit  >> $LOGFILE
+	echo "############# $(date) build_jenkins ##############"
+	build_jenkins  >> $LOGFILE
+	echo "############# $(date) build_pg_bugzilla ##############"
+	build_pg_bugzilla >> $LOGFILE
+	echo "############# $(date) build_bugzilla ##############"
+	build_bugzilla >> $LOGFILE
+	echo "############# $(date) build_buildfs ##############"
+	build_buildfs >> $LOGFILE
+	build_internal_repo >> $LOGFILE
 }
 
 function start_containers {
+	echo "############# $(date) STARTING CONTAINERS ##############"
 	create_docker_network
 	start_jenkins
 	start_pg_gerrit
