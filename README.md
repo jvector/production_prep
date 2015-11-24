@@ -44,6 +44,7 @@ This will create some folders on host as per the defaults file used by the Conta
 * **APTLY_DATA** - Stores a shared /usr/src/aptly between containers
 * **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
 * **PG_BUGZILLA_DATA** - Stores Postgresql Database used by Bugzilla
+* **SRV_CHROOT_DATA** - Stores Chroots used by Gerrit/Jenkins Nodes
 
 #### To remove the Containers
 Run ./rmbuildsystem.sh

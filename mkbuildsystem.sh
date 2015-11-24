@@ -24,7 +24,7 @@ if [ "$DEV" = 1 ]; then
 fi
 
 function setup_config {
-	echo "############# $(date )SET UP CONFIG ##############"
+	echo "############# $(date ) SET UP CONFIG ##############"
 	generate_keys
 	patch_buildsystem_references
 	fix_change_merged_for_new_gerrit
@@ -49,6 +49,8 @@ function copy_into_mounts {
 	copy_into_gerrit_gits
 	copy_into_home_build_mount
 	copy_into_mnt_build
+	copy_into_srv_chroots
+	copy_into_aptly
 }
 
 function build_images {

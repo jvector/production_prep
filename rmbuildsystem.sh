@@ -15,7 +15,7 @@ done
 source container_functions.sh
 
 function stop_containers {
-	echo "############# $(date )STOPPING CONTAINERS ##############"
+	echo "############# $(date ) STOPPING CONTAINERS ##############"
 	rm_jenkins
 	rm_pg_gerrit
 	rm_gerrit
@@ -28,17 +28,19 @@ function stop_containers {
 }
 
 function clear_mounted_files {
-	echo "############# $(date )CLEARING MOUNTED FILES ##############"
+	echo "############# $(date ) CLEARING MOUNTED FILES ##############"
 	rm_from_repo
 	rm_from_shared_src
 	rm_from_shared_dev-metadata
 	rm_from_gerrit_gits
 	rm_from_home_build_mount
 	rm_from_mnt_build
+	rm_from_srv_chroots
+	rm_from_aptly
 }
 
 function rm_local_copies {
-	echo "############# $(date )CLEANING UP LOCAL ENVIRONMENT ##############"
+	echo "############# $(date ) CLEANING UP LOCAL ENVIRONMENT ##############"
 	rm_shared_copies
 	rm_gnupg
 	rm_apt-keys
