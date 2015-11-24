@@ -7,9 +7,7 @@ USER=build
 # chown everything to jenkins.
 chown -R ${USER}:${USER} /var/jenkins_home/
 
-reprepro -b /usr/src/repository createsymlinks
-
-chown -R ${USER}:${USER} /usr/src/repository
+gosu ${USER} reprepro -b /usr/src/repository createsymlinks
 
 # Link in the aptly config from buildsystem (this one call does it for all containers)
 # Uncomment this when we have a dev-aptly environment and won't break anything on live

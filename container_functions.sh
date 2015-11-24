@@ -87,6 +87,8 @@ BUILDLOGS_URL=${BUILDLOGS_URL:-http://localhost:6789/logs}
 PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
 PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
+BUILD_USER_UID=${BUILD_USER_UID:-1001}
+
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
 }
@@ -445,12 +447,6 @@ function rm_internal_repo {
     docker rm -v ${INTERNAL_REPO_NAME}
 }
 
-function rm_gerrit {
-  docker stop ${GERRIT_NAME}
-  docker rm -v ${GERRIT_NAME}
-  sudo rm -rf ${GERRIT_DATA}
-}
-
 # This function is to prevent needing to run the Docker build's from a higher context.
 # It allows multiple images to share files, without needing duplicate copies.
 function copy_shared {
@@ -476,6 +472,7 @@ function rm_shared_copies {
 # Copies our local copy of buildsystem into the mounted fs for /usr/src/buildsystem
 function copy_into_shared_src {
     cp -ar shared_src/buildsystem $BUILDSYSTEM_DATA
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} $BUILDSYSTEM_DATA
 }
 
 # Clears the mounted fs for /usr/src/buildsystem
@@ -486,6 +483,7 @@ function rm_from_shared_src {
 # Copies our local copy of dev-metadata into the mounted fs for /usr/src/dev-metadata
 function copy_into_shared_dev-metadata {
     cp -ar shared_src/dev-metadata $DEVMETADATA_DATA
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} $DEVMETADATA_DATA
 }
 
 # Clears the mounted fs for /usr/src/dev-metadata
@@ -496,6 +494,7 @@ function rm_from_shared_dev-metadata {
 # Copies our local copy of repository into the mounted fs for /usr/src/repository
 function copy_into_repo {
     cp -ar shared_src/repository $REPO_DATA
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} $REPO_DATA
 }
 
 # Clears the mounted fs for /usr/src/repository
@@ -509,6 +508,7 @@ function copy_into_mnt_build {
     # on build's. May have similar parts fall over without being initialised first,
     # expect to add as bumped into.
     cp -a shared_mnt_build/. $MNTBUILD_DATA
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} $MNTBUILD_DATA
 }
 
 # Clears the mounted fs for /mnt/build
@@ -520,6 +520,7 @@ function rm_from_mnt_build {
 function copy_into_home_build_mount {
     mkdir -p $HOME_BUILD_DATA
     cp -ar shared_home/build $HOME_BUILD_DATA
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} $HOME_BUILD_DATA
 }
 
 # Clears the mounted fs for /home/build
@@ -632,11 +633,21 @@ function rm_from_gerrit_gits {
 # between all three nodes, when on seperate nodes will need to change.
 function copy_into_srv_chroots {
     cp -ar shared_chroots ${SRV_CHROOT_DATA}
+    sudo chown -R 0:0 ${SRV_CHROOT_DATA}
 }
 
 # Clears the mounted fs for /src/chroot
 function rm_from_srv_chroots {
-    rm -rf ${SRV_CHROOT_DATA}
+    sudo rm -rf ${SRV_CHROOT_DATA}
+}
+
+function copy_into_aptly {
+    cp -ar shared_aptly ${APTLY_DATA}
+    sudo chown -R ${BUILD_USER_UID}:${BUILD_USER_UID} ${APTLY_DATA}
+}
+
+function rm_from_aptly {
+    sudo rm -rf ${APTLY_DATA}
 }
 
 # Find the definitions of these params in the gerrit hooks code and

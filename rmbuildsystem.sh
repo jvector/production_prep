@@ -36,6 +36,7 @@ function clear_mounted_files {
 	rm_from_home_build_mount
 	rm_from_mnt_build
 	rm_from_srv_chroots
+	rm_from_aptly
 }
 
 function rm_local_copies {

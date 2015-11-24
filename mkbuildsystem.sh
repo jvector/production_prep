@@ -50,6 +50,7 @@ function copy_into_mounts {
 	copy_into_home_build_mount
 	copy_into_mnt_build
 	copy_into_srv_chroots
+	copy_into_aptly
 }
 
 function build_images {
