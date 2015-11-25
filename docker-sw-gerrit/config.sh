@@ -31,6 +31,7 @@ mkdir -p /var/gerrit/review_site/hooks
 chown gerrit2:gerrit2 /var/gerrit/review_site/hooks
 ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/hooks/change-merged
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
+ln -sf /usr/src/buildsystem/gerrithooks/ref-updated /var/gerrit/review_site/hooks/ref-updated
 
 # Get the Jenkins CLI
 wget -P /home/build http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
