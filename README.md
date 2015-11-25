@@ -33,17 +33,17 @@ You can supply this script with some options.
 
 This will create some folders on host as per the defaults file used by the Containers
 
-* **PG_GERRIT_DATA** - Stores Postgresql Database used by Gerrit
-* **GERRIT_DATA** - Stores Gerrit's home directory. (Not including .git's)
-* **JENKINS_DATA** - Stores Jenkins jobs only (including build history)
-* **BUILDSYSTEM_DATA** - Stores a shared /usr/src/buildsystem/ between containers
-* **REPO_DATA** - Stores a shared /usr/src/repository/ between containers
-* **HOME_BUILD_DATA** - Stores a shared /home/build/ between containers
-* **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
-* **MNTBUILD_DATA** - Stores a shared /mnt/build between containers
 * **APTLY_DATA** - Stores a shared /usr/src/aptly between containers
+* **BUILDSYSTEM_DATA** - Stores a shared /usr/src/buildsystem/ between containers
+* **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
+* **GERRIT_DATA** - Stores Gerrit's home directory. (Not including .git's)
 * **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
+* **HOME_BUILD_DATA** - Stores a shared /home/build/ between containers
+* **JENKINS_DATA** - Stores Jenkins jobs only (including build history)
+* **MNTBUILD_DATA** - Stores a shared /mnt/build between containers
 * **PG_BUGZILLA_DATA** - Stores Postgresql Database used by Bugzilla
+* **PG_GERRIT_DATA** - Stores Postgresql Database used by Gerrit
+* **REPO_DATA** - Stores a shared /usr/src/repository/ between containers
 * **SRV_CHROOT_DATA** - Stores Chroots used by Gerrit/Jenkins Nodes
 
 #### To remove the Containers
