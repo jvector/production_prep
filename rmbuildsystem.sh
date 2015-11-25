@@ -29,14 +29,18 @@ function stop_containers {
 
 function clear_mounted_files {
 	echo "############# $(date ) CLEARING MOUNTED FILES ##############"
-	rm_from_repo
+	# Commented out so that we do not lose our entire 300GB stack of data if we need to restart the containers.
+	#clear_mounted_files
+
+	# rm_from_repo
+	# Always clear shared_src so it get's re-patched with the right container Names
 	rm_from_shared_src
-	rm_from_shared_dev-metadata
-	rm_from_gerrit_gits
-	rm_from_home_build_mount
-	rm_from_mnt_build
-	rm_from_srv_chroots
-	rm_from_aptly
+	# rm_from_shared_dev-metadata
+	# rm_from_gerrit_gits
+	# rm_from_home_build_mount
+	# rm_from_mnt_build
+	# rm_from_srv_chroots
+	# rm_from_aptly
 }
 
 function rm_local_copies {
@@ -50,6 +54,5 @@ function rm_local_copies {
 }
 
 stop_containers
-# Commented out so that we do not lose our entire 300GB stack of data if we need to restart the containers.
-#clear_mounted_files
+clear_mounted_files
 rm_local_copies

@@ -32,6 +32,7 @@ fi
 
 # Jenkins Location config
 gosu ${USER} sed -i -e "s/@SYSADMINMAIL@/$SYSADMINMAIL/" \
+                    -e "s/@HOST@/$HOST" \
                         /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
 
 # Create a convenience symlink for debootstrap script

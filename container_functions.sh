@@ -15,6 +15,9 @@ else
 	source $DEFAULTS_FILE
 fi
 
+# Set as Host -> localhost if workstation only.
+HOST=${HOST:-10.0.16.1}
+
 # Docker Network
 DOCKER_NETWORK=${DOCKER_NETWORK:-buildsystem}
 
@@ -30,7 +33,7 @@ REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
 
 # Gerrit
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
-GERRIT_WEBURL=${GERRIT_WEBURL:-http://localhost:8080}
+GERRIT_WEBURL=${GERRIT_WEBURL:-http://$HOST:8080}
 GERRIT_NAME=${GERRIT_NAME:-gerrit}
 GERRIT_DATA=${GERRIT_DATA:-/var/lib/containers/${GERRIT_IMAGE}}
 
@@ -44,17 +47,17 @@ JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster}
 JENKINS_NAME=${JENKINS_MASTER_NAME}
 JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
-JENKINS_URL=${JENKINS_URL:-http://localhost:9000}
+JENKINS_URL=${JENKINS_URL:-http://$HOST:9000}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
-JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-localhost}
+JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-$HOST}
 SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
 BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
 ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
-BUGZILLA_URL=${BUGZILLA_URL:-http://localhost:8888}
+BUGZILLA_URL=${BUGZILLA_URL:-http://$HOST:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
@@ -64,23 +67,23 @@ PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 # Buildfs / Lighttpd File server
 BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
 BUILDFS_NAME=${BUILDFS_NAME:-buildfs}
-BUILDFS_URL=${BUILDFS_URL:-http://localhost:6789}
+BUILDFS_URL=${BUILDFS_URL:-http://$HOST:6789}
 
 # Gitweb runs on gerrit:80 (internal port)
 GITWEB_NAME=${GERRIT_NAME}
-GITWEB_URL=${GITWEB_URL:-http://localhost:8081}
+GITWEB_URL=${GITWEB_URL:-http://$HOST:8081}
 
 # URL for Internal Repository / Lighttpd File server
 INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
 INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal_repo}
-INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://localhost:9876}
+INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://$HOST:9876}
 
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
 
 ISOGEN_NAME=${ISOGEN_NAME:-buildfs/isogen}
 BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs/logs}
-BUILDLOGS_URL=${BUILDLOGS_URL:-http://localhost:6789/logs}
+BUILDLOGS_URL=${BUILDLOGS_URL:-http://$HOST:6789/logs}
 
 # This will be used in releasegen as the public facing repository
 # (currently repo.smoothwall.net)
@@ -88,6 +91,10 @@ PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
 PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
 BUILD_USER_UID=${BUILD_USER_UID:-1001}
+
+# Change to $BUGZILLA_NAME if you want to use Bugzilla container
+BUGZILLA_HOSTNAME=${BUGZILLA_HOSTNAME:-bugzilla.soton.smoothwall.net}
+
 
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
@@ -171,6 +178,7 @@ function start_jenkins {
         -e "JENCHILD1_EXECUTORS=2" \
         -e "JENCHILD2_EXECUTORS=2" \
         -e "BUILDLOGS_URL=${BUILDLOGS_URL}" \
+        -e "HOST=${HOST}" \
         --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
 
@@ -306,6 +314,7 @@ function start_gerrit {
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \
     -e REDIS_HOSTNAME=${REDIS_NAME} \
+    -e HOST=${HOST} \
     --net=${DOCKER_NETWORK} \
     -d ${GERRIT_IMAGE}
 
@@ -661,12 +670,12 @@ function patch_gerrit_hooks {
 	/use constant JENKINS /c \
 	use constant JENKINS => 'http://${JENKINS_MASTER_NAME}:8080/';
 	/use constant BUGZILLA_SERVER /c \
-	use constant BUGZILLA_SERVER => '${BUGZILLA_NAME}';
+	use constant BUGZILLA_SERVER => '${BUGZILLA_HOSTNAME}';
 	/use constant GITWEB /c \
 	use constant GITWEB => 'http://${GITWEB_NAME}';
 	" shared_src/buildsystem/gerrithooks/GerritHooks.pm
 
-	sed -i -e "s/bugzilla.soton.smoothwall.net/${BUGZILLA_NAME}/;" \
+	sed -i -e "s/bugzilla.soton.smoothwall.net/${BUGZILLA_HOSTNAME}/;" \
 		shared_src/buildsystem/gerrithooks/bugzilla-connection-test.pl
 
 }
@@ -677,6 +686,7 @@ function patch_genesis_refs {
     -e "s/@JENCHILD2@/${JENKINS_CHILD2_NAME}/" \
     -e "s/@GERRIT@/${GERRIT_NAME}/" \
 	-e "s/@INTERNAL_REPO_NAME@/${INTERNAL_REPO_NAME}/" \
+	-e "s/@HOST@/${HOST}/" \
     configuration.json.master \
     > shared_src/buildsystem/genesis/configuration.json
 

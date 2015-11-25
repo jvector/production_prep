@@ -14,7 +14,7 @@ function set_secure_config {
 # Smoothwall specific settings
 # set_gerrit_config auth.trustedOpenID 'https://www.google.com/accounts/o8/id?id='
 # set_gerrit_config core.streamFileThreshold '100 m'
-# set_gerrit_config gitweb.url 'http://localhost/'
+# set_gerrit_config gitweb.url 'http://$HOST/'
 set_gerrit_config gerrit.basePath '/usr/src/gerrit'
 # 
 # gosu ${GERRIT_USER} curl -L https://github.com/davido/gerrit-oauth-provider/releases/download/v0.3/gerrit-oauth-provider.jar -o ${GERRIT_SITE}/plugins/gerrit-oauth-provider.jar
