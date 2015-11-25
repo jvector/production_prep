@@ -33,6 +33,9 @@ ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/ho
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
 ln -sf /usr/src/buildsystem/gerrithooks/ref-updated /var/gerrit/review_site/hooks/ref-updated
 
+# Link in the aptly config from buildsystem (this one call does it for all containers)
+ln -s /usr/src/buildsystem/aptly/aptly.conf /usr/src/aptly/aptly.conf
+
 # Get the Jenkins CLI
 wget -P /home/build http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
 chown build:build /home/build/jenkins-cli.jar
