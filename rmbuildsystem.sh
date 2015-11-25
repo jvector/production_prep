@@ -50,5 +50,6 @@ function rm_local_copies {
 }
 
 stop_containers
-clear_mounted_files
+# Commented out so that we do not lose our entire 300GB stack of data if we need to restart the containers.
+#clear_mounted_files
 rm_local_copies

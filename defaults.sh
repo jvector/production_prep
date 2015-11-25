@@ -9,7 +9,7 @@ DEV=1
 
 # If your home dir is on sotonfs, or you want to use a dir other than $HOME
 # put an alternative in BUILD_HOME
-#BUILD_HOME=""
+BUILD_HOME="/root/container-mounts"
 
 PG_GERRIT_DATA=${BUILD_HOME:-$HOME}/postgres-test
 GERRIT_DATA=${BUILD_HOME:-$HOME}/gerrit-test

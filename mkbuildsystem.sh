@@ -85,6 +85,8 @@ function start_containers {
 setup_config
 # Copy into local before mounting
 copy_into_local
-copy_into_mounts
+# Commented out so we don't replace existing with new if we need to rebuild. 
+# RUN MANUALLY ON FIRST START OR IF $BUILD_HOME/*-TEST GETS LOST/BROKEN
+#copy_into_mounts
 build_images
 start_containers
