@@ -2,12 +2,10 @@
 
 # rsync script to to copy live data to Docker container environment
 
-source defaults.sh
-
 JENKINS=192.168.128.28
 GERRIT_LIVE=192.168.128.59
 
-FILES_TO_COPY=$(cd .. && pwd )/files_to_copy
+DB_DUMPS=/usr/src/db_dumps
 
 #Container gerrit2/build user UIDs
 GERRIT_UID=1000
@@ -24,7 +22,7 @@ function copy_jenkins {
 	# 23GB
 	# owned by root , 755 on source and on dest
 
-	rsync ${RSYNC_OPTS} victor@${JENKINS}:/etc/schroot/chroot.d/* $FILES_TO_COPY/common_jenkins/chroot.d/
+	rsync ${RSYNC_OPTS} victor@${JENKINS}:/etc/schroot/chroot.d/* $ETC_SCHROOT_CHROOTD/
 	# 616KB
 	# owned by root , 755 on source and on dest
 
@@ -52,29 +50,46 @@ function copy_gerrit {
 	# 65GB
 	# owner build, 755
 	chown -R $BUILD_UID:$BUILD_UID $APTLY_DATA
+}
 
+function copy_db_backups {
 	# Database Dumps
 	# owner postgres, 644
 
-	LATEST_BUGZ_BACKUP=$(ssh victor@$GERRIT_LIVE "ls -t /global/maintenance/bugzilla_backups/ | head -1")
-	OUR_BUGZ_DUMP_GZ=$FILES_TO_COPY/docker-sw-bugzilla-postgres/bugs_backup.sql.gz
-	OLD_BUGZ_DUMP=$FILES_TO_COPY/docker-sw-bugzilla-postgres/bugs_backup.sql
-	rsync -av victor@${GERRIT_LIVE}:/global/maintenance/bugzilla_backups/${LATEST_BUGZ_BACKUP} ${OUR_BUGZ_DUMP_GZ}
-	rm ${OLD_BUGZ_DUMP}
-	gunzip ${OUR_BUGZ_DUMP_GZ}
+	# LATEST_BUGZ_BACKUP=$(ssh victor@$GERRIT_LIVE "ls -t /global/maintenance/bugzilla_backups/ | head -1")
+	# OUR_BUGZ_DUMP_GZ=$DB_DUMP/bugs_backup.sql.gz
+	# OLD_BUGZ_DUMP=$DB_DUMP/bugs_backup.sql
+	# rsync -av victor@${GERRIT_LIVE}:/global/maintenance/bugzilla_backups/${LATEST_BUGZ_BACKUP} ${OUR_BUGZ_DUMP_GZ}
+	# rm ${OLD_BUGZ_DUMP}
+	# gunzip ${OUR_BUGZ_DUMP_GZ}
 
 	LATEST_GERRIT_BACKUP=$(ssh victor@$GERRIT_LIVE "ls -t /global/maintenance/gerrit_backups/ | head -1")
-	OUR_GERRIT_DUMP_GZ=$FILES_TO_COPY/docker-sw-gerrit-postgres/gerrit_backup.sql.gz
-	OLD_GERRIT_DUMP=$FILES_TO_COPY/docker-sw-gerrit-postgres/gerrit_backup.sql
+	OUR_GERRIT_DUMP_GZ=$DB_DUMP/gerrit_backup.sql.gz
+	OLD_GERRIT_DUMP=$DB_DUMP/gerrit_backup.sql
 	rsync -av victor@${GERRIT_LIVE}:/global/maintenance/gerrit_backups/${LATEST_GERRIT_BACKUP} ${OUR_GERRIT_DUMP_GZ}
 	rm ${OLD_GERRIT_DUMP}
 	gunzip ${OUR_GERRIT_DUMP_GZ}
+}
+
+function import_db_backups {
+	# Exec and postgrscopy that stuff in for Bugz and Gerrit
+
+	#copy the .sql's to $PG_BUGZILLA_DATA
+	#cp $DB_DUMP/bugs_backup.sql $PG_BUGZILLA_DATA
+	#copy the .sql's to $PG_GERRIT_DATA
+	cp $DB_DUMP/gerrit_backup.sql $PG_GERRIT_DATA
+
+	#import into bugs
+	#docker exec ${PG_BUGZILLA_NAME} psql -h 127.0.0.1 -d bugs -U bugs < /var/lib/postgresql/data/bugs_backup.sql
+
+	#import into gerrit
+	docker exec ${PG_GERRIT_NAME} psql -h 127.0.0.1 -d reviewdb -U gerrit2 < /var/lib/postgresql/data/gerrit_backup.sql
 }
 
 function copy_dev {
 	DEV_COPY=/global/users/jonathan.barron/cbuildsystem-starter-pack
 	echo "Files required are @ ${DEV_COPY}, for now come and find Jon/Victor"
 
-	# rsync ${RSYNC_OPTS} $DEV_COPY/files_to_copy/ $FILES_TO_COPY
+	# rsync ${RSYNC_OPTS} $DEV_COPY/files_to_copy/ $DB_DUMP
 	# rsync ${RSYNC_OPTS} $DEV_COPY/jenkins-test/jobs $JENKINS_DATA
 }

@@ -77,11 +77,6 @@ COPY config_files/ ${JENKINS_HOME}
 	#Scripts
 COPY scripts/ /scripts
 COPY jenkins-start.sh /
-	# Copy in Chroot config's
-	# FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
-	# on demand from live. For now we have copies of these files.
-COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
-COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
 	# Jenkins plugin's
 	# This could also be done by passing plugins.txt to plugins.sh,
 	# but that requires redownloading all the plugins (which don't change)

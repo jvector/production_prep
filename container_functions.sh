@@ -35,7 +35,6 @@ REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
 GERRIT_WEBURL=${GERRIT_WEBURL:-http://$HOST:8080}
 GERRIT_NAME=${GERRIT_NAME:-gerrit}
-GERRIT_DATA=${GERRIT_DATA:-/var/lib/containers/${GERRIT_IMAGE}}
 
 # Jenkins
     # Images
@@ -169,6 +168,7 @@ function start_jenkins {
         -v ${MNTBUILD_DATA}:/mnt/build \
         -v ${APTLY_DATA}:/usr/src/aptly \
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
+        -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
         -p 9000:8080 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
@@ -202,6 +202,7 @@ function start_jenchild {
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DATA}:/usr/src/aptly \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
+    -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
     --net=${DOCKER_NETWORK} \
     -d ${JENKINS_CHILD_IMAGE}
 }
@@ -247,7 +248,8 @@ function start_pg_gerrit {
   # work.
   echo "Waiting for the database to become ready ..."
   echo "(This should take about 10s)"
-  while [ -z "$(docker logs ${PG_GERRIT_NAME} 2>&1 | grep 'autovacuum launcher started')" ]; do
+  while [ -z "$(docker logs ${PG_GERRIT_NAME} 2>&1 | grep 'Future log output will appear in directory "pg_log".
+')" ]; do
     sleep 2
     echo "(still waiting)"
   done
@@ -258,7 +260,7 @@ sleep 30
 function rm_pg_gerrit {
   docker stop ${PG_GERRIT_NAME}
   docker rm -v ${PG_GERRIT_NAME}
-  sudo rm -rf ${PG_GERRIT_DATA}
+  # sudo rm -rf ${PG_GERRIT_DATA}
 }
 
 ### Redis
@@ -296,9 +298,9 @@ function build_gerrit {
 
 function start_gerrit {
   echo "Starting Gerrit ..."
+    # -v ${GERRIT_DATA}:/var/gerrit/review_site \
   docker run \
     --name ${GERRIT_NAME} \
-    -v ${GERRIT_DATA}:/var/gerrit/review_site \
     -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
     -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
     -v ${REPO_DATA}:/usr/src/repository \
@@ -335,7 +337,7 @@ function start_gerrit {
 function rm_gerrit {
   docker stop ${GERRIT_NAME}
   docker rm -v ${GERRIT_NAME}
-  sudo rm -rf ${GERRIT_DATA}
+  # sudo rm -rf ${GERRIT_DATA}
 }
 
 ### PostgreSQL Bugzilla
@@ -375,7 +377,7 @@ function start_pg_bugzilla {
 function rm_pg_bugzilla {
   docker stop ${PG_BUGZILLA_NAME}
   docker rm -v ${PG_BUGZILLA_NAME}
-  sudo rm -rf ${PG_BUGZILLA_DATA}
+  # sudo rm -rf ${PG_BUGZILLA_DATA}
 }
 
 function build_bugzilla {

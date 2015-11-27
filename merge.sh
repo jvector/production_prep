@@ -30,17 +30,17 @@ fi
 if [ -e defaults.sh ]; then
 	echo "You're trying to run this inside a work dir. cd .. and run again" && exit
 fi
-if [ "$FAST" != 1 ]; then
-	rm -rf cbuildsystem-merged/
-	mkdir cbuildsystem-merged
-	cp -ar cbuildsystem/*        cbuildsystem-merged/
-	cp -ar cbuild-secrets/.     cbuildsystem-merged/
+# if [ "$FAST" != 1 ]; then
+rm -rf cbuildsystem-merged/
+mkdir cbuildsystem-merged
+cp -ar cbuildsystem/*        cbuildsystem-merged/
+cp -ar cbuild-secrets/.     cbuildsystem-merged/
 
-	cp -ar files_to_copy/. cbuildsystem-merged/
-else
-	cp -ar cbuildsystem/*       cbuildsystem-merged/
-	cp -ar cbuild-secrets/.     cbuildsystem-merged/
-fi
+	# cp -ar files_to_copy/. cbuildsystem-merged/
+# else
+# 	cp -ar cbuildsystem/*       cbuildsystem-merged/
+# 	cp -ar cbuild-secrets/.     cbuildsystem-merged/
+# fi
 
 
 echo "Finished"

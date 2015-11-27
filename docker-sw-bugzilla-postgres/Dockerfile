@@ -17,4 +17,4 @@ ENV ENTRYPOINT /docker-entrypoint-initdb.d
 COPY postgresql.conf ${ENTRYPOINT}/conf/postgresql.conf
 COPY config.sh ${ENTRYPOINT}/config.sh
 
-COPY bugs_backup.sql ${ENTRYPOINT}/bugs_backup.sql
+# COPY bugs_backup.sql ${ENTRYPOINT}/bugs_backup.sql

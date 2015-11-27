@@ -52,10 +52,10 @@ set_secure_config database.password "${PGPASSWORD}"
 
 # Do some configuration!
 # Insert redis hostname into apt-version-mapper and build-debian-contextualiser
-gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
-						 /usr/src/buildsystem/buildsystem/apt-version-mapper
-gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
-					 /usr/src/buildsystem/buildsystem/build-debian-contextualizer
+# gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
+# 						 /usr/src/buildsystem/buildsystem/apt-version-mapper
+# gosu build sed -i -e "s/gerrit.soton.smoothwall.net/$REDIS_HOSTNAME/" \
+# 					 /usr/src/buildsystem/buildsystem/build-debian-contextualizer
 
 #[commentlink "bugzilla"]
 #  match = "(bug\\s+#?)(\\d+)"

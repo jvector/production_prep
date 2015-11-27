@@ -34,10 +34,10 @@ function clear_mounted_files {
 
 	# rm_from_repo
 	# Always clear shared_src so it get's re-patched with the right container Names
-	rm_from_shared_src
+	#rm_from_shared_src
 	# rm_from_shared_dev-metadata
 	# rm_from_gerrit_gits
-	# rm_from_home_build_mount
+	rm_from_home_build_mount
 	# rm_from_mnt_build
 	# rm_from_srv_chroots
 	# rm_from_aptly
@@ -48,7 +48,6 @@ function rm_local_copies {
 	rm_shared_copies
 	rm_gnupg
 	rm_apt-keys
-	rm_common_jenkins
 	rm_shared_bugzilla
 	rm_shared_db_conf
 }

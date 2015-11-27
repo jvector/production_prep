@@ -11,6 +11,6 @@ ENV ENTRYPOINT /docker-entrypoint-initdb.d
 COPY postgresql.conf ${ENTRYPOINT}/conf/postgresql.conf
 COPY config.sh ${ENTRYPOINT}/config.sh
 
-COPY gerrit_backup.sql ${ENTRYPOINT}/gerrit_backup.sql
+# COPY gerrit_backup.sql ${ENTRYPOINT}/gerrit_backup.sql
 
 # See readme.md for running and diagnostics
