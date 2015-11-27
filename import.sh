@@ -29,7 +29,8 @@ case "$1" in
 	;;
 esac
 
-git clone -b <PUT BRANCH HERE> --single-branch http://gerrit.soton.smoothwall.net/buildsystem $BUILDSYSTEM_DATA
+# FIXME: Should be master when merged?
+git clone -b pb/containerize --single-branch http://gerrit.soton.smoothwall.net/buildsystem $BUILDSYSTEM_DATA
 git clone http://gerrit.soton.smoothwall.net/dev-metadata $DEVMETADATA_DATA
 
 #reload shit

@@ -101,13 +101,12 @@ function fail {
 
 # Precursor function to generate ssh keys for jenkins master->child
 function generate_keys {
-    # Make the key for build user
-    mkdir -p shared_home/build/.ssh
-    ssh-keygen -N "" -f shared_home/build/.ssh/id_rsa -C "Generated_by_DockerFile_for_build_user"
+    chmod 600 shared_home/build/.ssh/id_rsa
 
+    #FIXME: This is probably already done in live.
     # Copy jenkins' key into SQL template
-    sed -e "s:@BUILD_SSH_KEY@:$(cat shared_home/build/.ssh/id_rsa.pub):" \
-    docker-sw-gerrit/jenkins_user.sql.master > docker-sw-gerrit/jenkins_user.sql
+    # sed -e "s:@BUILD_SSH_KEY@:$(cat shared_home/build/.ssh/id_rsa.pub):" \
+    # docker-sw-gerrit/jenkins_user.sql.master > docker-sw-gerrit/jenkins_user.sql
 
     # Give the same key to Gerrit2
     mkdir -p docker-sw-gerrit/.ssh
