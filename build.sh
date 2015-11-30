@@ -6,7 +6,7 @@ source container_functions.sh
 LOGFILE=build.log
 
 # Config
-generate_keys
+distribute_keys
 
 # Move to local contexts
 copy_shared
@@ -33,4 +33,4 @@ echo "############# $(date) build_buildfs ##############"
 build_buildfs >> $LOGFILE
 build_internal_repo >> $LOGFILE
 
-echo "Build finished, now run ./start.sh"
+echo "Build finished, now run ./run.sh"

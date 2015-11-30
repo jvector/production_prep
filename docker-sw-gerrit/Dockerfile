@@ -14,7 +14,7 @@ ENV GERRIT_INIT_ARGS \
   --install-plugin=singleusergroup
 
 # Copy the ssh keys previously generated into our DockerFile location,
-# as made by the initial generate_keys step of the mkbuildsystem script
+# as made by the initial distribute_keys step of the mkbuildsystem script
 
 RUN apt-get update && apt-get -y -q install \
     sudo \

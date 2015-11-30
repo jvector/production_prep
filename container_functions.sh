@@ -60,8 +60,8 @@ BUGZILLA_URL=${BUGZILLA_URL:-http://$HOST:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
-PG_BUGZILLA_NAME=${PG_BUGZILLA:-pg-bugzilla}
-PG_BUGZILLA_DATA=${PG_BUGZILLA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
+PG_BUGZILLA_NAME=${PG_BUGZILLA_NAME:-pg-bugzilla}
+PG_BUGZILLA_DATA=${PG_BUGZILLA_DATA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 
 # Buildfs / Lighttpd File server
 BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
@@ -89,18 +89,30 @@ BUILDLOGS_URL=${BUILDLOGS_URL:-http://$HOST:6789/logs}
 PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
 PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
+GERRIT2_USER_UID=${GERRIT2_USER_UID:-1000}
 BUILD_USER_UID=${BUILD_USER_UID:-1001}
+POSTGRES_USER_UID=${POSTGRES_USER_UID:-999}
 
 # Change to $BUGZILLA_NAME if you want to use Bugzilla container
 BUGZILLA_HOSTNAME=${BUGZILLA_HOSTNAME:-bugzilla.soton.smoothwall.net}
 
+function wait {
+    #$1 is container NAME
+    #$2 is string to wait for
+    echo "Waiting for $1 to become ready..."
+    while [ -z "$(docker logs $1 2>&1 | grep "$2")" ]; do
+        sleep 5
+        echo "(still waiting)"
+    done
+    echo "$1 is ready."
+}
 
 function fail {
     echo "$@ returning... $?" >&2 && exit 2
 }
 
 # Precursor function to generate ssh keys for jenkins master->child
-function generate_keys {
+function distribute_keys {
     chmod 600 shared_home/build/.ssh/id_rsa
 
     #FIXME: This is probably already done in live.
@@ -142,18 +154,13 @@ function build_jenkins {
     build_jenkins_master
 }
 
-function start_jenkins {
+function run_jenkins {
     echo "Waking up child nodes.."
-    start_jenchild $JENKINS_CHILD1_NAME
-    start_jenchild $JENKINS_CHILD2_NAME
+    run_jenchild $JENKINS_CHILD1_NAME
+    run_jenchild $JENKINS_CHILD2_NAME
 
-    echo "Waiting for the jenkins child nodes to become ready ..."
-	echo "(This should take about 10s)"
-	while [ -z "$(docker logs ${JENKINS_CHILD1_NAME} 2>&1 | grep 'Starting Jenkins Child')" ] || \
-			  [ -z "$(docker logs ${JENKINS_CHILD2_NAME} 2>&1 | grep 'Starting Jenkins Child')" ]; do
-		sleep 1
-		echo "(still waiting)"
-	done
+    wait $JENKINS_CHILD1_NAME "Starting Jenkins Child"
+    wait $JENKINS_CHILD2_NAME "Starting Jenkins Child"
 
     # Jenkins Master
     docker run \
@@ -181,15 +188,11 @@ function start_jenkins {
         --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
 
-    echo "Waiting for the jenkins master to become ready ..."
-	echo "(This should take about 60s)"
-	while [ -z "$(docker logs ${JENKINS_MASTER_NAME} 2>&1 | grep 'setting agent port for jnlp... done')" ]; do
-		sleep 4
-		echo "(still waiting)"
-	done
+    wait $JENKINS_MASTER_NAME "setting agent port for jnlp... done"
 }
 
-function start_jenchild {
+
+function run_jenchild {
     CHILD_NAME=$1
     docker run \
     --name=${CHILD_NAME} \
@@ -206,12 +209,21 @@ function start_jenchild {
     -d ${JENKINS_CHILD_IMAGE}
 }
 
-function rm_jenkins {
-# Assuming to remove children -> master at the same time, maybe change
+function start_jenkins {
+    docker start ${JENKINS_MASTER_NAME}
+    docker start ${JENKINS_CHILD1_NAME}
+    docker start ${JENKINS_CHILD2_NAME}
+}
+
+function stop_jenkins {
     # Stop
     docker stop ${JENKINS_MASTER_NAME}
     docker stop ${JENKINS_CHILD1_NAME}
     docker stop ${JENKINS_CHILD2_NAME}
+}
+
+function rm_jenkins {
+# Assuming to remove children -> master at the same time, maybe change
     # Remove
     docker rm -v ${JENKINS_MASTER_NAME}
     docker rm -v ${JENKINS_CHILD1_NAME}
@@ -226,7 +238,7 @@ function build_pg_gerrit {
          fail "Building image ${PG_GERRIT_IMAGE} failed"
 }
 
-function start_pg_gerrit {
+function run_pg_gerrit {
   echo "Starting PostgreSQL Gerrit..."
   
   # Kept in secrets git
@@ -242,22 +254,17 @@ function start_pg_gerrit {
     --net=${DOCKER_NETWORK} \
     -d ${PG_GERRIT_IMAGE}
 
-  # This actually only works the first time the container is spun up.
-  # When running this up with an existing data directory, it won't
-  # work.
-  echo "Waiting for the database to become ready ..."
-  echo "(This should take about 10s)"
-  while [ -z "$(docker logs ${PG_GERRIT_NAME} 2>&1 | grep 'Future log output will appear in directory "pg_log".
-')" ]; do
-    sleep 2
-    echo "(still waiting)"
-  done
-sleep 30
-  echo "PostgreSQL Gerrit container ${PG_GERRIT_NAME} running."
+  wait $PG_GERRIT_NAME "Future log output will appear in directory"
 }
 
+function start_pg_gerrit {
+    docker start ${PG_GERRIT_NAME}
+}
+
+function stop_pg_gerrit {
+    docker stop ${PG_GERRIT_NAME}
+}
 function rm_pg_gerrit {
-  docker stop ${PG_GERRIT_NAME}
   docker rm -v ${PG_GERRIT_NAME}
   # sudo rm -rf ${PG_GERRIT_DATA}
 }
@@ -266,7 +273,7 @@ function rm_pg_gerrit {
 # Redis does not have a build step, we can use the official image as is, we don't
 # need to configure or import any data.
 
-function start_redis {
+function run_redis {
     echo "Starting Redis ..."
     docker run \
         --name ${REDIS_NAME} \
@@ -274,17 +281,18 @@ function start_redis {
         --net=${DOCKER_NETWORK} \
         -d ${REDIS_IMAGE}
 
-    echo "Waiting for redis to boot..."
-    echo "(This should take about 5s)"
-    while [ -z "$(docker logs ${REDIS_NAME} 2>&1 | grep 'ready to accept connections on port 6379')" ]; do
-      sleep 5
-      echo "(still waiting)"
-    done
-    echo "Redis container ${REDIS_NAME} running."
+    wait $REDIS_NAME "ready to accept connections on port 6379"
+}
+
+function start_redis {
+    docker start ${REDIS_NAME}
+}
+
+function stop_redis {
+    docker stop ${REDIS_NAME}
 }
 
 function rm_redis {
-    docker stop ${REDIS_NAME}
     docker rm -v ${REDIS_NAME}
 }
 
@@ -295,7 +303,7 @@ function build_gerrit {
            fail "Building image ${GERRIT_IMAGE} failed"
 }
 
-function start_gerrit {
+function run_gerrit {
   echo "Starting Gerrit ..."
     # -v ${GERRIT_DATA}:/var/gerrit/review_site \
   docker run \
@@ -319,22 +327,22 @@ function start_gerrit {
     --net=${DOCKER_NETWORK} \
     -d ${GERRIT_IMAGE}
 
-  echo "Waiting for Gerrit to boot ..."
-  echo "(This should take about 45s)"
-  while [ -z "$(docker logs ${GERRIT_NAME} 2>&1 | grep 'Daemon : Gerrit Code Review')" ]; do
-    sleep 8
-    echo "(still waiting)"
-  done
-
-  echo "Gerrit container ${GERRIT_NAME} running."
+  wait $GERRIT_NAME "Daemon : Gerrit Code Review"
 
   #https://code.google.com/p/gerrit/issues/detail?id=1305
   # Got problems with init? See above ...
 
 }
 
+function start_gerrit {
+    docker start ${GERRIT_NAME}
+}
+
+function stop_gerrit {
+    docker stop ${GERRIT_NAME}
+}
+
 function rm_gerrit {
-  docker stop ${GERRIT_NAME}
   docker rm -v ${GERRIT_NAME}
   # sudo rm -rf ${GERRIT_DATA}
 }
@@ -345,7 +353,7 @@ function build_pg_bugzilla {
            fail "Building image ${PG_BUGZILLA_IMAGE} failed"
 }
 
-function start_pg_bugzilla {
+function run_pg_bugzilla {
     echo "Starting PostgreSQL Bugzilla ..."
 
     # Kept in secrets git
@@ -361,20 +369,18 @@ function start_pg_bugzilla {
         --net=${DOCKER_NETWORK} \
         -d ${PG_BUGZILLA_IMAGE}
 
-    # This actually only works the first time the container is spun up.
-    # When running this up with an existing data directory, it won't
-    # work.
-    echo "Waiting for the database to become ready ..."
-    echo "(This should take about 40s)"
-    while [ -z "$(docker logs ${PG_BUGZILLA_NAME} 2>&1 | grep 'PostgreSQL init process complete; ready for start up')" ]; do
-        sleep 8
-        echo "(still waiting)"
-    done
-    echo "PostgreSQL Bugzilla container ${PG_BUGZILLA_NAME} running."
+    wait $PG_BUGZILLA_NAME "PostgreSQL init process complete; ready for start up"
+}
+
+function start_pg_bugzilla {
+    docker start ${PG_BUGZILLA_NAME}
+}
+
+function stop_pg_bugzilla {
+    docker stop ${PG_BUGZILLA_NAME}
 }
 
 function rm_pg_bugzilla {
-  docker stop ${PG_BUGZILLA_NAME}
   docker rm -v ${PG_BUGZILLA_NAME}
   # sudo rm -rf ${PG_BUGZILLA_DATA}
 }
@@ -384,7 +390,7 @@ function build_bugzilla {
             fail "Building image ${BUGZILLA_IMAGE} failed"
 }
 
-function start_bugzilla {
+function run_bugzilla {
     echo "Starting Bugzilla..."
     docker run \
         --name ${BUGZILLA_NAME} \
@@ -393,19 +399,20 @@ function start_bugzilla {
         --net=${DOCKER_NETWORK} \
 		-e ADMIN_EMAIL=${ADMIN_EMAIL} \
         -d ${BUGZILLA_IMAGE}
-        
-    echo "Waiting for Bugzilla to boot..."
-    echo "(This should take about 20s)"
+
     # FIXME: If we ever set a fully qualified domain name this needs to be changed.
-    while [ -z "$(docker logs ${BUGZILLA_NAME} 2>&1 | grep 'directive globally to suppress this message')" ]; do
-      sleep 8
-      echo "(still waiting)"
-    done
-    echo "Bugzilla container ${BUGZILLA_NAME} running."
+    wait $BUGZILLA_NAME "directive globally to suppress this message"
+}
+
+function start_bugzilla {
+    docker start ${BUGZILLA_NAME}
+}
+
+function stop_bugzilla {
+    docker stop ${BUGZILLA_NAME}
 }
 
 function rm_bugzilla {
-    docker stop ${BUGZILLA_NAME}
     docker rm ${BUGZILLA_NAME}
 }
 
@@ -417,7 +424,7 @@ function build_buildfs {
     fail "Building image ${BUILDFS_IMAGE} failed"
 }
 
-function start_buildfs {
+function run_buildfs {
     echo "Starting Buildfs..."
     docker run \
         --name ${BUILDFS_NAME} \
@@ -428,8 +435,15 @@ function start_buildfs {
     echo "Buildfs container ${BUILDFS_NAME} running."
 }
 
-function rm_buildfs {
+function start_buildfs {
+    docker start ${BUILDFS_NAME}
+}
+
+function stop_buildfs {
     docker stop ${BUILDFS_NAME}
+}
+
+function rm_buildfs {
     docker rm -v ${BUILDFS_NAME}
 }
 
@@ -441,7 +455,7 @@ function build_internal_repo {
     fail "Building image ${INTERNAL_REPO_IMAGE} failed"
 }
 
-function start_internal_repo {
+function run_internal_repo {
     echo "Starting Internal Repository.."
     docker run \
         --name ${INTERNAL_REPO_NAME} \
@@ -452,8 +466,15 @@ function start_internal_repo {
     echo "Internal repository container ${INTERNAL_REPO_NAME} running."
 }
 
-function rm_internal_repo {
+function start_internal_repo {
+    docker start ${INTERNAL_REPO_NAME}
+}
+
+function stop_internal_repo {
     docker stop ${INTERNAL_REPO_NAME}
+}
+
+function rm_internal_repo {
     docker rm -v ${INTERNAL_REPO_NAME}
 }
 
@@ -535,7 +556,7 @@ function copy_into_home_build_mount {
 
 # Clears the mounted fs for /home/build
 function rm_from_home_build_mount {
-    sudo rm -rf $HOME_BUILD_DATA
+    sudo rm -rf $HOME_BUILD_DATA/*
 }
 
 # Copy our apt-keys (cbuild-secrets.git) into build context for each container
@@ -773,4 +794,39 @@ function patch_gerrit_site_header {
 	-e "s#@GITWEB@#${GITWEB_URL}#" \
     docker-sw-gerrit/GerritSiteHeader.html.master \
     > docker-sw-gerrit/GerritSiteHeader.html
+}
+
+# FIXME: Will be removed when all is on BUILDFS and has correct permissions/exists already
+function make_mount_directories {
+    for i in \
+        $APTLY_DATA \
+        $BUILDSYSTEM_DATA \
+        $DEVMETADATA_DATA \
+        $GERRIT_GIT_DATA \
+        $HOME_BUILD_DATA \
+        $JENKINS_DATA \
+        $MNTBUILD_DATA \
+        $PG_BUGZILLA_DATA \
+        $PG_GERRIT_DATA \
+        $REPO_DATA \
+        $SRV_CHROOT_DATA \
+        $ETC_SCHROOT_CHROOTD \
+        ; do
+            mkdir -p $i
+    done
+}
+
+# FIXME: Will be removed when all is on BUILDFS and has correct permissions/exists already
+# This needs to be ran twice currently. The empty directories need to have the correct permissions
+# and then once data is imported into them, so do their contents
+function change_permissions_of_mounts {
+    # Chown everything to build
+    sudo chown -R $BUILD_USER_UID:$BUILD_USER_UID $BUILD_HOME
+    # Then rechown those which need to be other.
+    # chroot's in srv-chroot & chroot config's in etc-schroot need to be root
+    sudo chown -R 0:0 $ETC_SCHROOT_CHROOTD $SRV_CHROOT_DATA
+    # And git's need to be owned by Gerrit2
+    sudo chown -R $GERRIT2_USER_UID:$GERRIT2_USER_UID $GERRIT_GIT_DATA
+    # And postgres needs to be postgres User
+    sudo chown -R $POSTGRES_USER_UID:$POSTGRES_USER_UID $PG_GERRIT_DATA $PG_BUGZILLA_DATA
 }

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Copyright Smoothwall Ltd 2015
 
-apt-get update
-apt-get -y -q install curl
+if [ ! $(which curl) ]; then
+	apt-get update
+	apt-get -y -q install curl
+fi
 
 cd ..
 # Clone cbuild-secrets

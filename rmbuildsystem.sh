@@ -37,7 +37,7 @@ function clear_mounted_files {
 	#rm_from_shared_src
 	# rm_from_shared_dev-metadata
 	# rm_from_gerrit_gits
-	rm_from_home_build_mount
+	# rm_from_home_build_mount
 	# rm_from_mnt_build
 	# rm_from_srv_chroots
 	# rm_from_aptly

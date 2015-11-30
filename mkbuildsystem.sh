@@ -25,7 +25,7 @@ fi
 
 function setup_config {
 	echo "############# $(date ) SET UP CONFIG ##############"
-	generate_keys
+	distribute_keys
 	patch_buildsystem_references
 	fix_change_merged_for_new_gerrit
 	patch_gerrit_site_header
@@ -48,7 +48,7 @@ function copy_into_mounts {
 
 	# copy_into_repo
 	# Run shared_src to copy in new Buildsystem & patch it everytime.
-	copy_into_shared_src
+	# copy_into_shared_src
 	# copy_into_shared_dev-metadata
 	# copy_into_gerrit_gits
 	# copy_into_home_build_mount
@@ -73,17 +73,17 @@ function build_images {
 	build_internal_repo >> $LOGFILE
 }
 
-function start_containers {
+function run_containers {
 	echo "############# $(date) STARTING CONTAINERS ##############"
 	create_docker_network
-	start_jenkins
-	start_pg_gerrit
-	start_redis
-	start_gerrit
-	# start_pg_bugzilla
-	# start_bugzilla
-	start_buildfs
-	start_internal_repo
+	run_jenkins
+	run_pg_gerrit
+	run_redis
+	run_gerrit
+	# run_pg_bugzilla
+	# run_bugzilla
+	run_buildfs
+	run_internal_repo
 }
 
 setup_config
@@ -91,4 +91,4 @@ setup_config
 copy_into_local
 copy_into_mounts
 build_images
-start_containers
+run_containers
