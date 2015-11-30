@@ -31,6 +31,10 @@ mkdir -p /var/gerrit/review_site/hooks
 chown gerrit2:gerrit2 /var/gerrit/review_site/hooks
 ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/hooks/change-merged
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
+ln -sf /usr/src/buildsystem/gerrithooks/ref-updated /var/gerrit/review_site/hooks/ref-updated
+
+# Link in the aptly config from buildsystem (this one call does it for all containers)
+ln -s /usr/src/buildsystem/aptly/aptly.conf /usr/src/aptly/aptly.conf
 
 # Get the Jenkins CLI
 

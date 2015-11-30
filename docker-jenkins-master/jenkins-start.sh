@@ -9,10 +9,6 @@ chown -R ${USER}:${USER} /var/jenkins_home/
 
 gosu ${USER} reprepro -b /usr/src/repository createsymlinks
 
-# Link in the aptly config from buildsystem (this one call does it for all containers)
-# Uncomment this when we have a dev-aptly environment and won't break anything on live
-#ln -s /usr/src/buildsystem/aptly/aptly.conf /usr/src/aptly/aptly.conf
-
 # Do some configuration!
 # Insert valid IP's & Executors for the Child nodes
  gosu ${USER} sed -i -e "s/@JENCHILD1_HOST@/$JENCHILD1_HOSTNAME/" \
