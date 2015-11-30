@@ -41,7 +41,7 @@ COPY .ssh/ /var/gerrit/.ssh
 COPY scripts/ /scripts
 COPY config.sh ${ENTRYPOINT}/config.sh
     # SQL
-COPY jenkins_user.sql /jenkins_user.sql
+#COPY jenkins_user.sql /jenkins_user.sql
     # Password for PG, stored in private Git
 COPY pg-gerrit-password.sh /pg-gerrit-password.sh
     # Gerrit start replace

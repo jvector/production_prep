@@ -3,7 +3,7 @@ set -e
 
 chown -R gerrit2:gerrit2 /usr/src/gerrit
 
-psql -U gerrit2 -d reviewdb -h $DATABASE_HOSTNAME < /jenkins_user.sql
+#psql -U gerrit2 -d reviewdb -h $DATABASE_HOSTNAME < /jenkins_user.sql
 
 java -jar /var/gerrit/review_site/bin/gerrit.war init -d /var/gerrit/review_site
 
