@@ -77,6 +77,10 @@ INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
 INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal-repo-container}
 INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://$HOST:9876}
 
+# Reverse proxy container
+REVERSE_PROXY_IMAGE=${REVERSE_PROXY_IMAGE:-sw/reverse-proxy}
+REVERSE_PROXY_NAME=${REVERSE_PROXY_NAME:-reverse-proxy-container}
+
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
 
@@ -476,6 +480,35 @@ function stop_internal_repo {
 
 function rm_internal_repo {
     docker rm -v ${INTERNAL_REPO_NAME}
+}
+
+function build_reverse_proxy {
+    docker build \
+        -t ${REVERSE_PROXY_NAME} \
+        docker-sw-reverse-proxy || \
+    fail "Building image ${REVERSE_PROXY_NAME} failed"
+}
+
+function run_reverse_proxy {
+    echo "Starting reverse proxy..."
+    docker run \
+        --name ${REVERSE_PROXY_NAME} \
+        -p 80:80 \
+        --net=${DOCKER_NETWORK} \
+        -d ${REVERSE_PROXY_NAME}
+    echo "Reverse proxy started"
+}
+
+function start_reverse_proxy {
+    docker start ${REVERSE_PROXY_NAME}
+}
+
+function stop_reverse_proxy {
+    docker stop ${REVERSE_PROXY_NAME}
+}
+
+function rm_reverse_proxy {
+    docker rm ${REVERSE_PROXY_NAME}
 }
 
 # This function is to prevent needing to run the Docker build's from a higher context.

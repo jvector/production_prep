@@ -71,6 +71,7 @@ function build_images {
 	# echo "############# $(date) build_buildfs ##############"
 	build_buildfs >> $LOGFILE
 	build_internal_repo >> $LOGFILE
+	build_reverse_proxy >> $LOGFILE
 }
 
 function run_containers {
@@ -84,6 +85,7 @@ function run_containers {
 	# run_bugzilla
 	run_buildfs
 	run_internal_repo
+	run_reverse_proxy
 }
 
 setup_config

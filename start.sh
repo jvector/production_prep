@@ -28,3 +28,4 @@ start_gerrit
 #start_bugzilla
 start_buildfs
 start_internal_repo
+start_reverse_proxy

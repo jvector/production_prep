@@ -23,7 +23,7 @@ rm_gerrit
 # rm_bugzilla
 rm_buildfs
 rm_internal_repo
-
+rm_reverse_proxy
 rm_docker_network
 
 echo "############# $(date ) CLEANING UP LOCAL ENVIRONMENT ##############"

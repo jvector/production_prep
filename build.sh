@@ -29,8 +29,9 @@ build_jenkins  >> $LOGFILE
 # build_pg_bugzilla >> $LOGFILE
 # echo "############# $(date) build_bugzilla ##############"
 # build_bugzilla >> $LOGFILE
-echo "############# $(date) build_buildfs ##############"
+echo "############# $(date) building extras ##############"
 build_buildfs >> $LOGFILE
 build_internal_repo >> $LOGFILE
+build_reverse_proxy >> $LOGFILE
 
 echo "Build finished, now run ./run.sh"

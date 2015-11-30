@@ -15,5 +15,6 @@ run_gerrit
 # run_bugzilla
 run_buildfs
 run_internal_repo
+run_reverse_proxy
 
 echo "Barebone containers started: Now run import.sh if necessary"
