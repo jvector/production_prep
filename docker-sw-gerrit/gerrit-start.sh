@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# set -e
 
 chown -R gerrit2:gerrit2 /usr/src/gerrit
 

@@ -23,29 +23,29 @@ DOCKER_NETWORK=${DOCKER_NETWORK:-buildsystem}
 
 # PostgreSQL Gerrit
 PG_GERRIT_IMAGE=${PG_GERRIT_IMAGE:-sw/gerrit-postgres}
-PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit}
+PG_GERRIT_NAME=${PG_GERRIT_NAME:-pg-gerrit-container}
 PG_GERRIT_DATA=${PG_GERRIT_DATA:-/var/lib/containers/${PG_GERRIT_IMAGE}}
 
 # Redis
 REDIS_IMAGE=redis:3.0.5
-REDIS_NAME=${REDIS_NAME:-redis}
+REDIS_NAME=${REDIS_NAME:-redis-container}
 REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
 
 # Gerrit
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
 GERRIT_WEBURL=${GERRIT_WEBURL:-http://$HOST:8080}
-GERRIT_NAME=${GERRIT_NAME:-gerrit}
+GERRIT_NAME=${GERRIT_NAME:-gerrit-container}
 
 # Jenkins
     # Images
 JENKINS_MASTER_IMAGE=${JENKINS_MASTER_IMAGE:-sw/jenkins-master}
 JENKINS_CHILD_IMAGE=${JENKINS_CHILD_IMAGE:-sw/jenkins-child}
     # Names
-JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster}
+JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster-container}
 # For use in patch_project_logger_refs
 JENKINS_NAME=${JENKINS_MASTER_NAME}
-JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1}
-JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2}
+JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1-container}
+JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2-container}
 JENKINS_URL=${JENKINS_URL:-http://$HOST:9000}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
@@ -54,18 +54,18 @@ SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
-BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla}
+BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla-container}
 ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
 BUGZILLA_URL=${BUGZILLA_URL:-http://$HOST:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
-PG_BUGZILLA_NAME=${PG_BUGZILLA_NAME:-pg-bugzilla}
+PG_BUGZILLA_NAME=${PG_BUGZILLA_NAME:-pg-bugzilla-container}
 PG_BUGZILLA_DATA=${PG_BUGZILLA_DATA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 
 # Buildfs / Lighttpd File server
 BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
-BUILDFS_NAME=${BUILDFS_NAME:-buildfs}
+BUILDFS_NAME=${BUILDFS_NAME:-buildfs-web-container}
 BUILDFS_URL=${BUILDFS_URL:-http://$HOST:6789}
 
 # Gitweb runs on gerrit:80 (internal port)
@@ -74,7 +74,7 @@ GITWEB_URL=${GITWEB_URL:-http://$HOST:8081}
 
 # URL for Internal Repository / Lighttpd File server
 INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
-INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal_repo}
+INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal-repo-container}
 INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://$HOST:9876}
 
 ########### Urls on buildfs, which we will probably run in a dedicated
@@ -101,7 +101,7 @@ function wait {
     #$2 is string to wait for
     echo "Waiting for $1 to become ready..."
     while [ -z "$(docker logs $1 2>&1 | grep "$2")" ]; do
-        sleep 5
+        sleep 30
         echo "(still waiting)"
     done
     echo "$1 is ready."

@@ -81,7 +81,8 @@ COPY jenkins-start.sh /
 	# This could also be done by passing plugins.txt to plugins.sh,
 	# but that requires redownloading all the plugins (which don't change)
 	# each time it is built
-COPY pluginjars/ /usr/share/jenkins/ref/plugins
+RUN /usr/local/bin/plugins.sh /plugins.txt
+#COPY pluginjars/ /usr/share/jenkins/ref/plugins
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 

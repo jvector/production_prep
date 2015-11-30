@@ -33,8 +33,9 @@ ln -sf /usr/src/buildsystem/gerrithooks/change-merged /var/gerrit/review_site/ho
 ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site/hooks/patchset-created
 
 # Get the Jenkins CLI
-wget -P /home/build http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
-chown build:build /home/build/jenkins-cli.jar
+
+# wget -P /home/build http://${JENKINS_MASTER_HOSTNAME}:8080/jnlpJars/jenkins-cli.jar
+# chown build:build /home/build/jenkins-cli.jar
 
 chown -R  ${GERRIT_USER}:${GERRIT_USER} /var/gerrit/
 

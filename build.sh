@@ -16,7 +16,7 @@ copy_common_jenkins
 copy_shared_db_conf
 
 # For the keys to work
-copy_into_home_build_mount
+#copy_into_home_build_mount
 
 # Build the images
 echo "############# $(date) build_pg_gerrit ##############"

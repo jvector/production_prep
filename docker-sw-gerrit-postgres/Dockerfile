@@ -10,6 +10,7 @@ ENV ENTRYPOINT /docker-entrypoint-initdb.d
 
 COPY postgresql.conf ${ENTRYPOINT}/conf/postgresql.conf
 COPY config.sh ${ENTRYPOINT}/config.sh
+COPY dbimport.sh /dbimport.sh
 
 # COPY gerrit_backup.sql ${ENTRYPOINT}/gerrit_backup.sql
 

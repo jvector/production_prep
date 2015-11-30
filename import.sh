@@ -45,9 +45,11 @@ function import_db_backups {
 
 	#import into bugs
 	#docker exec ${PG_BUGZILLA_NAME} psql -h 127.0.0.1 -d bugs -U bugs < /var/lib/postgresql/data/bugs_backup.sql
+	# docker exec ${PG_BUGZILLA_NAME} /dbimport.sh
 
 	#import into gerrit
-	docker exec ${PG_GERRIT_NAME} sh -c "psql -h 127.0.0.1 -d reviewdb -U gerrit2 < /var/lib/postgresql/data/gerrit_backup.sql"
+	# docker exec ${PG_GERRIT_NAME} gosu postgres sh -c "psql -h 127.0.0.1 -d reviewdb -U gerrit2 < /var/lib/postgresql/data/gerrit_backup.sql"
+	docker exec ${PG_GERRIT_NAME} /dbimport.sh
 	echo "Databases imported."
 }
 
