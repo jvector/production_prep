@@ -82,6 +82,9 @@ INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
 INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal-repo-container}
 INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://$HOST:9876}
 
+MERGED_REPO_IMAGE=${MERGED_REPO_IMAGE:-sw/lighttpd/merged_repo}
+MERGED_REPO_NAME=${MERGED_REPO_NAME:-merged-repo-container}
+
 # Reverse proxy container
 REVERSE_PROXY_IMAGE=${REVERSE_PROXY_IMAGE:-sw/reverse-proxy}
 REVERSE_PROXY_NAME=${REVERSE_PROXY_NAME:-reverse-proxy-container}
@@ -486,6 +489,37 @@ function stop_internal_repo {
 function rm_internal_repo {
     docker rm -v ${INTERNAL_REPO_NAME}
 }
+
+function build_merged_repo {
+    docker build \
+        -t ${MERGED_REPO_IMAGE} \
+        --build-arg SERVER_ROOT=/mnt/aptly \
+        docker-sw-lighttpd || \
+    fail "Building image ${MERGED_REPO_IMAGE} failed"
+}
+
+function run_merged_repo {
+    echo "Starting Merged Repository.."
+    docker run \
+        --name ${MERGED_REPO_NAME} \
+        -v ${APTLY_DATA}:/mnt/aptly \
+        --net=${DOCKER_NETWORK} \
+        -d ${MERGED_REPO_IMAGE}
+    echo "Merged repository container ${MERGED_REPO_NAME} running."
+}
+
+function start_merged_repo {
+    docker start ${MERGED_REPO_NAME}
+}
+
+function stop_merged_repo {
+    docker stop ${MERGED_REPO_NAME}
+}
+
+function rm_merged_repo {
+    docker rm -v ${MERGED_REPO_NAME}
+}
+
 
 function build_reverse_proxy {
     docker build \

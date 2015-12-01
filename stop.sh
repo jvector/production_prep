@@ -23,4 +23,5 @@ stop_gerrit
 # stop_bugzilla
 stop_buildfs
 stop_internal_repo
+stop_merged_repo
 stop_reverse_proxy

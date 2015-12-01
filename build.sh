@@ -27,6 +27,7 @@ copy_shared
 copy_gnupg
 copy_apt-keys
 copy_common_jenkins
+#copy_shared_bugzilla
 copy_shared_db_conf
 
 # For the keys to work
@@ -46,6 +47,7 @@ build_jenkins  >> $LOGFILE
 echo "############# $(date) building extras ##############"
 build_buildfs >> $LOGFILE
 build_internal_repo >> $LOGFILE
+build_merged_repo >> $LOGFILE
 build_reverse_proxy >> $LOGFILE
 
 echo "Build finished, now run ./run.sh"

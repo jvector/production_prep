@@ -10,4 +10,6 @@ RUN apt-get update \
 RUN sed -i -e "s:/var/www/html:${SERVER_ROOT}:" /etc/lighttpd/lighttpd.conf
 RUN lighttpd-enable-mod cgi dir-listing accesslog
 
+EXPOSE 80
+
 ENTRYPOINT [ "lighttpd", "-D", "-f", "/etc/lighttpd/lighttpd.conf" ]
