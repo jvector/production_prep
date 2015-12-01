@@ -15,8 +15,13 @@ else
 	source $DEFAULTS_FILE
 fi
 
+# defaults to dev unless you've set -d 0
+if [ $DEV ]; then
+    HOST=localhost
+fi
+
 # Set as Host -> localhost if workstation only.
-HOST=${HOST:-10.0.16.1}
+HOST=${HOST:-10.50.18.161}
 
 # Docker Network
 DOCKER_NETWORK=${DOCKER_NETWORK:-buildsystem}

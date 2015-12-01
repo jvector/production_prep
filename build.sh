@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 # Copyright Smoothwall Ltd 2015
 
+while getopts ":d:f:" opt; do
+	case "$opt" in
+		f)
+			DEFAULTS_FILE=$OPTARG
+			;;
+		d)
+			DEV=$OPTARG
+			;;
+		?)
+			echo "Unknown argument $opt."
+			echo "Valid options: -d 1 for dev mode, -f <filename> for non-default"
+	esac
+done
+
 source container_functions.sh
 
 LOGFILE=build.log

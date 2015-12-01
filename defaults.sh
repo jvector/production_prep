@@ -5,7 +5,7 @@
 
 # This stops jenkins configuring irc/mail plugins, can Also
 # be set using -d 1 on mkbuildsystem.sh
-DEV=1
+DEV=${DEV:-0}
 
 # If your home dir is on sotonfs, or you want to use a dir other than $HOME
 # put an alternative in BUILD_HOME
