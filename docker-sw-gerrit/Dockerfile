@@ -26,6 +26,8 @@ RUN apt-get update && apt-get -y -q install \
     reprepro \
     postgresql-client-9.4 \
     perl libwww-bugzilla-perl libipc-run-perl libjson-perl \
+    libparse-debcontrol-perl libxml-dom-perl \
+    libxml-dom-xpath-perl libthread-pool-simple-perl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy
