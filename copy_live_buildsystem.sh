@@ -5,8 +5,6 @@
 JENKINS=192.168.128.28
 GERRIT_LIVE=192.168.128.59
 
-DB_DUMPS=/usr/src/db_dumps
-
 #Container gerrit2/build user UIDs
 GERRIT_UID=1000
 BUILD_UID=1001
@@ -30,7 +28,6 @@ function copy_jenkins {
 	rsync ${RSYNC_OPTS} victor@${JENKINS}:/var/lib/jenkins/jobs $JENKINS_DATA
 	# 100GB
 	# owner build (1001), 755 on server
-	chown -R $BUILD_UID:$BUILD_UID $JENKINS_DATA
 }
 
 function copy_gerrit {
@@ -38,18 +35,15 @@ function copy_gerrit {
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/gerrit/ $GERRIT_GIT_DATA/
 	# 6GB
 	# owned by gerrit2, 755 on server. Here we have user 'container' with id=1000
-	chown -R $GERRIT_UID:$GERRIT_UID $GERRIT_GIT_DATA
 
 
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/repository/ $REPO_DATA/
 	# 100GB
 	# owner build (uid 9000) , 755 on server
-	chown -R $BUILD_UID:$BUILD_UID $REPO_DATA
 
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DATA/
 	# 65GB
 	# owner build, 755
-	chown -R $BUILD_UID:$BUILD_UID $APTLY_DATA
 }
 
 function copy_db_backups {
@@ -75,6 +69,6 @@ function copy_dev {
 	DEV_COPY=/global/users/jonathan.barron/cbuildsystem-starter-pack
 	echo "Files required are @ ${DEV_COPY}, for now come and find Jon/Victor"
 
-	# rsync ${RSYNC_OPTS} $DEV_COPY/files_to_copy/ $DB_DUMP
-	# rsync ${RSYNC_OPTS} $DEV_COPY/jenkins-test/jobs $JENKINS_DATA
+	sudo rsync -avz $DEV_COPY/container-mounts/ $BUILD_HOME
+	sudo rsync -avz $DEV_COPY/db_dumps/ $DB_DUMPS
 }

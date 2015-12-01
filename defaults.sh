@@ -10,6 +10,7 @@ DEV=1
 # If your home dir is on sotonfs, or you want to use a dir other than $HOME
 # put an alternative in BUILD_HOME
 BUILD_HOME="${BUILD_HOME:-$HOME}/container-mounts"
+DB_DUMPS=${BUILD_HOME:-$HOME}/db_dumps
 
 APTLY_DATA=${BUILD_HOME:-$HOME}/aptly-test/
 BUILDSYSTEM_DATA=${BUILD_HOME:-$HOME}/buildsystem-test/

@@ -75,6 +75,9 @@ case "$1" in
 	dev)
 		# Not yet implemented
 		copy_dev
+		import_db_backups
+		reload_jenkins
+		reload_gerrit
 	;;
 	*)
 		echo "Missing argument 'jenkins', 'gerrit', 'singlehost' or 'dev'" >&2
