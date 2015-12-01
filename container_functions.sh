@@ -328,6 +328,7 @@ function run_gerrit {
     -v ${APTLY_DATA}:/usr/src/aptly \
     -v ${GERRIT_GIT_DATA}:/usr/src/gerrit \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
+    -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
     -p 29418:29418 \
     -p 8080:8080 \
 	-p 8081:80 \
