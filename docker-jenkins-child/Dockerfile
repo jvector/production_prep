@@ -44,6 +44,7 @@ RUN apt-get update && apt-get -y upgrade \
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
 RUN useradd -u 1001 build
+RUN echo "build:Sm00th" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
 # If you want to build this manually, and the files don't exist it will error.

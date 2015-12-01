@@ -331,6 +331,7 @@ function run_gerrit {
     -p 29418:29418 \
     -p 8080:8080 \
 	-p 8081:80 \
+    -p 222:22 \
     -e WEBURL=${GERRIT_WEBURL} \
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \

@@ -55,7 +55,9 @@ COPY sudo.txt /sudo.txt
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd build
+RUN useradd -u 1001 build
+RUN echo "build:Sm00th" | sudo chpasswd
+
 RUN chown build:build /usr/src/ -Rf
 
 # Put patch-configuration in the right place
