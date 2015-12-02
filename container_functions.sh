@@ -300,6 +300,7 @@ function run_gerrit {
     # -v ${GERRIT_DATA}:/var/gerrit/review_site \
   docker run \
     --name ${GERRIT_NAME} \
+    --privileged \
     -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
     -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
     -v ${REPO_DATA}:/usr/src/repository \
