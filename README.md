@@ -1,42 +1,57 @@
 # cbuildsystem
 Containerised Build System
 
-There are the following things needed to get it to work:
-    
-* Contents of **cbuild-secrets** repository copied into this directory
+#### To bring up the Containers
+**Prerequisites**
+* Docker 1.9+ is installed
+* You need a GitHub account which has access to the Smoothwall private repo's (if you're reading this, it's likely you already have this).
 
-* shared_src needs cloned into it: **buildsystem.git** and **dev-metadata.git**
-
-* docker-sw-gerrit/gits needs **-- Standard Permissions --.git** *(Have fun copying that!)* **All-Projects.git** and **All-Users.git** plus **any gits you want available** within the cbuildsystem
-
-* docker-sw-gerrit-postgres needs a copy of the **live dbdump** saved as docker-sw-gerrit-postgres/gerrit_backup.sql
-
-* docker-jenkins-master/chroot.d & docker-jenkins-child/chroot.d need the **chroot config's** for any projects you wish to use
-
-* docker-jenkins-master/chroot & docker-jenkins-child/chroot need the **chroots matching above**
-
-* Copy in **/srv/build/logs** from buildfs to shared_mnt_build/logs \**not essential, build will still succeed without this but project-logger wont work\**
-
-* docker-sw-bugzilla-postgres needs a copy of **live dbdump** saved as
-docker-sw-bugzilla-postgres/bugs_backup.sql
-
-* Lastly you will need to copy (or generate via genesis) the relevant **jobs to match your git(s) & project(s)** into your mounted jenkins/jobs location
-
-#### To bring up the Containers 
-With the above steps completed, run ./mkbuildsystem.sh.
-You can supply this script with some options.
+**Steps**
+* Clone this repository into a directory on the host. *e.g. `/root/docker/cbuildsystem`*
+* At this point examine the contents of the file `defaults.sh`, if required either change `$BUILD_HOME` here or define and export in the root users `.bashrc` before continuing.
+* `cd` into that directory and run `./prepare.sh`, you will need to authenticate with GitHub as this will grab cbuild-secrets and merge that plus cbuildsystem, creating cbuildsystem-merged.
+    * `cd` into the newly created cbuildsystem-merged.
+    * Begin by running `./build.sh`, which will build all the images from the Dockerfiles
+    * If you have existing running containers (type `docker ps -a` to show) then you will need to run `./stop.sh` followed by `./remove.sh` now.
+    * Next run `./run.sh`, which will bring up all of the containers. You can supply this script with some options. *note: this can take 20mins+*
 
 | Option | Result |
 | :------ | :------ |
-| -d (0 or 1) | Dev mode ON/OFF, disables IRC & mail on jenkins |
-| -f (defaults file) | Point container_functions.sh at a non-standard defaults file |
+| -d (0 or 1) | Dev mode ON/OFF, disables IRC & mail on jenkins and changes some links to localhost, defaults to 0 if not provided. |
+| -f (defaults file) | Point container_functions.sh at a non-standard defaults file, defaults to using defaults.sh if not provided |
 
-This will create some folders on host as per the defaults file used by the Containers
+#### Importing Data
+* Once all the containers are initialized you will have an empty buildsystem. If you do not have existing data in the $BUILD_HOME directories you will need to run `import.sh`.
+* `import.sh` requires an argument, the options are 'jenkins', 'gerrit', 'singlehost' or 'dev'.
+    * **jenkins** - Not yet fully implemented, aiming to be used to get the relevant data used by a Jenkins-only Buildwhale
+    * **gerrit** - Not yet fully implemented, aiming to be used to get the relevant data used by a Gerrit-only Buildwhale
+    * **singlehost** - Grab a copy of all data from \*.metal.* buildsystem to create an replication of live including all its data. *note: 300GB+ data being moved around*
+    * **dev** - Populate your $BUILD_HOME with a small subset of data, a couple gits and chroot's, enough to be used as a local test buildsystem. *note: needs sotonfs mounted as /global*
 
-* **APTLY_DATA** - Stores a shared /usr/src/aptly between containers
+##### On a Buildwhale
+* Run the steps above, resulting in an empty buildsystem being created.
+* Verify that $BUILD_HOME is where you expected it to be, and that the partition it is on has sufficient space.
+* Generate a ssh-key and add that to .metal.Gerrit/Jenkins against user victor (FIXME)
+* Run `/import.sh singlehost` and wait.
+* Data will be rsync'd from Live, and when finished the containers reloaded. *note: reloading them will take a further 20mins+*
+
+##### On a local dev workstation
+* Run the steps above, resulting in an empty buildsystem being created.
+* Verify that $BUILD_HOME is where you expected it to be.
+* Run `/import.sh dev` and wait.
+* A small subset of data will be rsync'd from sotonfs, and when finished the containers reloaded.
+
+#### To remove the Containers
+Run ./stop.sh and then ./remove.sh.
+The data stored in $BUILD_HOME is left untouched by these scripts, so that it can persist. If you wont need any of this again and want to reclaim space, `rm -rf` your $BUILD_HOME directory.
+
+#### File stores
+The cbuildsystem Containers create/use some directories on the host as per the defaults file, these are.
+
+* **APTLY_DEBIANIZER_DATA** - Stores a shared /usr/src/aptly-debianizer between containers
+* **APTLY_S3_DATA** - Stores a shared /usr/src/aptly-s3 between containers
 * **BUILDSYSTEM_DATA** - Stores a shared /usr/src/buildsystem/ between containers
 * **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
-* **GERRIT_DATA** - Stores Gerrit's home directory. (Not including .git's)
 * **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
 * **HOME_BUILD_DATA** - Stores a shared /home/build/ between containers
 * **JENKINS_DATA** - Stores Jenkins jobs only (including build history)
@@ -45,7 +60,26 @@ This will create some folders on host as per the defaults file used by the Conta
 * **PG_GERRIT_DATA** - Stores Postgresql Database used by Gerrit
 * **REPO_DATA** - Stores a shared /usr/src/repository/ between containers
 * **SRV_CHROOT_DATA** - Stores Chroots used by Gerrit/Jenkins Nodes
+* **ETC_SCHROOT_CHROOT** - Stores Chroot configs used by Gerrit/Jenkins Nodes
 
-#### To remove the Containers
-Run ./rmbuildsystem.sh
-If your data locations are anywhere non standard, or you're using a file other than defaults.sh use -f <file to use> as above.
+Eventually these will be stored on Buildfs and only exist on local dev copies.
+
+#### Updating
+The easiest way is to wipe out the /root/docker directory and do the steps above again. The data that the containers use is untouched by the stop and remove scripts so when you bring up a new updated version providing you haven't broken things they should just work. 
+
+This will take the full 20mins+ so if you have a particularly minor change, or your changes only affect one/two containers you can `source container_functions.sh` and manually invoke the functions needed to stop_container, rm_container, build_container, run_container. Sometimes this way things can get out of sync, in which case it is recommended to just start again from scratch.
+
+*Note: If you re-clone cbuildsystem make sure to point defaults.sh at the same place to use the existing data*
+
+#### Debugging
+
+##### Build Errors
+Output of the `docker build` commands ran during `./build.sh` is directed to the file `build.log`, if your build fails you will execution will fail and the error will be returned. You can look at `build.log` for further information on progress / execution steps before it failed, although usually the error returned via the Docker build daemon is usually enough.
+
+#### Container logs
+Docker syphons the output of a containers running process (which due to the nature of containers, is the most important thing they run). As a result, you may not find log's where you expect them within the container. If you want to view logs use `docker logs <container-name>` (with the optional `-f` after logs to follow this).
+
+This log info persists even if the container bombs out and stops running, but is lost when you `docker rm <container-name>`
+
+#### Logging into Containers
+To get a shell on a running container, use `docker exec -it <container-name> bash`.
