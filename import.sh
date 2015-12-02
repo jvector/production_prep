@@ -63,8 +63,7 @@ case "$1" in
 		reload_gerrit
 	;;
 	singlehost)
-		# copy_jenkins
-		# copy_gerrit
+		# copy_singlehost
 		# copy_db_backups
 		import_db_backups
 		reload_jenkins

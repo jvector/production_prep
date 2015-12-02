@@ -15,35 +15,64 @@ BUILD_UID=1001
 
 RSYNC_OPTS="-az --dry-run"
 
-function copy_jenkins {
-	rsync ${RSYNC_OPTS} victor@${JENKINS}:/srv/chroot/ $SRV_CHROOT_DATA/
-	# 23GB
-	# owned by root , 755 on source and on dest
-
-	rsync ${RSYNC_OPTS} victor@${JENKINS}:/etc/schroot/chroot.d/* $ETC_SCHROOT_CHROOTD/
-	# 616KB
-	# owned by root , 755 on source and on dest
-
-
+function copy_jenkins_jobs {
 	rsync ${RSYNC_OPTS} victor@${JENKINS}:/var/lib/jenkins/jobs $JENKINS_DATA
 	# 100GB
 	# owner build (1001), 755 on server
 }
 
-function copy_gerrit {
+function copy_gerrit_gits {
 	# Gerrit:
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/gerrit/ $GERRIT_GIT_DATA/
 	# 6GB
 	# owned by gerrit2, 755 on server. Here we have user 'container' with id=1000
+}
 
+function copy_chroots {
+	rsync ${RSYNC_OPTS} victor@${JENKINS}:/srv/chroot/ $SRV_CHROOT_DATA/
+	# 23GB
+	# owned by root , 755 on source and on dest
+}
 
+function copy_chroot_configs {
+	rsync ${RSYNC_OPTS} victor@${GERRIT_LIVE}:/etc/schroot/chroot.d/ $ETC_SCHROOT_CHROOTD/
+	# 616KB
+	# owned by root , 755 on source and on dest
+}
+
+function copy_internal_repo {
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/repository/ $REPO_DATA/
 	# 100GB
 	# owner build (uid 9000) , 755 on server
+}
 
+function copy_merged_repo {
 	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DATA/
 	# 65GB
 	# owner build, 755
+}
+
+function copy_common_gerrit_jenkins {
+	copy_internal_repo
+	copy_merged_repo
+	copy_chroot_configs
+	copy_chroots
+}
+
+function copy_jenkins {
+	copy_jenkins_jobs
+	copy_common_gerrit_jenkins
+}
+
+function copy_gerrit {
+	copy_gerrit_gits
+	copy_common_gerrit_jenkins
+}
+
+function copy_singlehost {
+	copy_jenkins_jobs
+	copy_gerrit_gits
+	copy_common_gerrit_jenkins
 }
 
 function copy_db_backups {
