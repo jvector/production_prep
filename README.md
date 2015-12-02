@@ -4,12 +4,19 @@ Containerised Build System
 #### To bring up the Containers
 **Prerequisites**
 * Docker 1.9+ is installed
-* You need a GitHub account which has access to the Smoothwall private repo's (if you're reading this, it's likely you already have this).
+* You need access to the SmoothwallBuildUser GitHub account which has access to the Smoothwall private repo's ***or*** you need a copy of the build user's id_rsa from buildfs:/home/build/.ssh
 
 **Steps**
-* Clone this repository into a directory on the host. *e.g. `/root/docker/cbuildsystem`*
+* **First:** Either copy the build user's id_rsa from buildfs:/home/build/.ssh and add the following to your ~/.ssh/config
+```
+Host github.com
+ IdentityFile /path/to/build/users/ssh/id_rsa
+```
+or generate a key, and add it to the SmoothwallBuildUser's GitHub SSH keys.
+
+* **Then:** Clone this repository into a directory on the host. *e.g. `git clone git@github.com:Smoothwall/cbuild-secrets.git /root/docker/cbuildsystem`*
 * At this point examine the contents of the file `defaults.sh`, if required either change `$BUILD_HOME` here or define and export in the root users `.bashrc` before continuing.
-* `cd` into that directory and run `./prepare.sh`, you will need to authenticate with GitHub as this will grab cbuild-secrets and merge that plus cbuildsystem, creating cbuildsystem-merged.
+* `cd` into that directory and run `./prepare.sh`, creating cbuildsystem-merged.
     * `cd` into the newly created cbuildsystem-merged.
     * Begin by running `./build.sh`, which will build all the images from the Dockerfiles
     * If you have existing running containers (type `docker ps -a` to show) then you will need to run `./stop.sh` followed by `./remove.sh` now.
