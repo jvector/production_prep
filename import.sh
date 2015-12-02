@@ -4,11 +4,9 @@
 source copy_live_buildsystem.sh
 source container_functions.sh
 
-# FIXME: Should be master when merged?
-# git clone -b pb/containerize --single-branch http://gerrit.soton.smoothwall.net/buildsystem $BUILDSYSTEM_DATA
-# git clone http://gerrit.soton.smoothwall.net/dev-metadata $DEVMETADATA_DATA
-
-#reload shit
+# FIXME: Will need build's keys in its home dir for this to work.
+# git clone ssh://build@gerrit.container.soton.smoothwall.net:29418/buildsystem $BUILDSYSTEM_DATA
+# git clone ssh://build@gerrit.container.soton.smoothwall.net/dev-metadata $DEVMETADATA_DATA
 
 #Jenkins
 

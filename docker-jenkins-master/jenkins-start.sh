@@ -31,9 +31,6 @@ gosu ${USER} sed -i -e "s/@SYSADMINMAIL@/$SYSADMINMAIL/" \
                     -e "s/@HOST@/$HOST/" \
                         /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml
 
-# Create a convenience symlink for debootstrap script
-ln -s /usr/src/buildsystem/templates/debootstrap-smoothwall /usr/share/debootstrap/scripts/smoothwall
-
 # Gerrit trigger config
 gosu ${USER} sed -i -e "s/@GERRIT_HOSTNAME@/$GERRIT_NAME/" \
 				    /var/jenkins_home/gerrit-trigger.xml

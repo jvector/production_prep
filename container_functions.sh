@@ -16,8 +16,9 @@ else
 fi
 
 # defaults to dev unless you've set -d 0
-if [ $DEV ]; then
+if [ $DEV -eq 1 ]; then
     HOST=localhost
+    GERRIT_WEBURL=http://$HOST:8080/
 fi
 
 # Set as Host -> localhost if workstation only.
@@ -38,7 +39,7 @@ REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
 
 # Gerrit
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
-GERRIT_WEBURL=${GERRIT_WEBURL:-http://$HOST:8080}
+GERRIT_WEBURL=${GERRIT_WEBURL:-http://gerrit.container.soton.smoothwall.net}
 GERRIT_NAME=${GERRIT_NAME:-gerrit-container}
 
 # Jenkins
@@ -47,21 +48,16 @@ JENKINS_MASTER_IMAGE=${JENKINS_MASTER_IMAGE:-sw/jenkins-master}
 JENKINS_CHILD_IMAGE=${JENKINS_CHILD_IMAGE:-sw/jenkins-child}
     # Names
 JENKINS_MASTER_NAME=${JENKINS_MASTER_NAME:-jenmaster-container}
-# For use in patch_project_logger_refs
-JENKINS_NAME=${JENKINS_MASTER_NAME}
 JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1-container}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2-container}
-JENKINS_URL=${JENKINS_URL:-http://$HOST:9000}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
-JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_HOSTNAME:-$HOST}
 SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
 BUGZILLA_NAME=${BUGZILLA_NAME:-bugzilla-container}
 ADMIN_EMAIL=${ADMIN_MAIL:-buildturbo@smoothwall.net}
-BUGZILLA_URL=${BUGZILLA_URL:-http://$HOST:8888}
 
 # PostgreSQL Bugzilla
 PG_BUGZILLA_IMAGE=${PG_BUGZILLA_IMAGE:-sw/bugzilla-postgres}
@@ -71,16 +67,10 @@ PG_BUGZILLA_DATA=${PG_BUGZILLA_DATA:-/var/lib/containers/${PG_BUGZILLA_IMAGE}}
 # Buildfs / Lighttpd File server
 BUILDFS_IMAGE=${BUILDFS_IMAGE:-sw/lighttpd/buildfs}
 BUILDFS_NAME=${BUILDFS_NAME:-buildfs-web-container}
-BUILDFS_URL=${BUILDFS_URL:-http://$HOST:6789}
-
-# Gitweb runs on gerrit:80 (internal port)
-GITWEB_NAME=${GERRIT_NAME}
-GITWEB_URL=${GITWEB_URL:-http://$HOST:8081}
 
 # URL for Internal Repository / Lighttpd File server
 INTERNAL_REPO_IMAGE=${INTERNAL_REPO_IMAGE:-sw/lighttpd/internal_repo}
 INTERNAL_REPO_NAME=${INTERNAL_REPO_NAME:-internal-repo-container}
-INTERNAL_REPO_URL=${INTERNAL_REPO_URL:-http://$HOST:9876}
 
 MERGED_REPO_IMAGE=${MERGED_REPO_IMAGE:-sw/lighttpd/merged_repo}
 MERGED_REPO_NAME=${MERGED_REPO_NAME:-merged-repo-container}
@@ -92,21 +82,11 @@ REVERSE_PROXY_NAME=${REVERSE_PROXY_NAME:-reverse-proxy-container}
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
 
-ISOGEN_NAME=${ISOGEN_NAME:-buildfs/isogen}
-BUILDLOGS_NAME=${BUILDLOGS_NAME:-buildfs/logs}
 BUILDLOGS_URL=${BUILDLOGS_URL:-http://$HOST:6789/logs}
-
-# This will be used in releasegen as the public facing repository
-# (currently repo.smoothwall.net)
-PUB_REPO_HOST=${PUB_REPO_HOST:-PUBLIC_REPO_UNDEFINED}
-PARTNERNET_HOST=${PARTNERNET_HOST:-PARTNER_UNDEFINED}
 
 GERRIT2_USER_UID=${GERRIT2_USER_UID:-1000}
 BUILD_USER_UID=${BUILD_USER_UID:-1001}
 POSTGRES_USER_UID=${POSTGRES_USER_UID:-999}
-
-# Change to $BUGZILLA_NAME if you want to use Bugzilla container
-BUGZILLA_HOSTNAME=${BUGZILLA_HOSTNAME:-bugzilla.soton.smoothwall.net}
 
 function wait {
     #$1 is container NAME
@@ -335,7 +315,6 @@ function run_gerrit {
     -p 222:22 \
     -e WEBURL=${GERRIT_WEBURL} \
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
-    -e JENKINS_MASTER_HOSTNAME=${JENKINS_MASTER_NAME} \
     -e REDIS_HOSTNAME=${REDIS_NAME} \
     -e HOST=${HOST} \
     --net=${DOCKER_NETWORK} \
