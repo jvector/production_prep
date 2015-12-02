@@ -77,21 +77,19 @@ COPY config_files/ ${JENKINS_HOME}
 	#Scripts
 COPY scripts/ /scripts
 COPY jenkins-start.sh /
-	# Copy in Chroot config's
-	# FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
-	# on demand from live. For now we have copies of these files.
-COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
-COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
 	# Jenkins plugin's
 	# This could also be done by passing plugins.txt to plugins.sh,
 	# but that requires redownloading all the plugins (which don't change)
 	# each time it is built
-COPY pluginjars/ /usr/share/jenkins/ref/plugins
+RUN /usr/local/bin/plugins.sh /plugins.txt
+#COPY pluginjars/ /usr/share/jenkins/ref/plugins
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd build
+RUN useradd -u 1001 build
+RUN echo "build:Sm00th" | sudo chpasswd
+
 RUN chown build:build /usr/src/ -Rf
 
 # Put patch-configuration in the right place
