@@ -12,7 +12,8 @@ DEV=${DEV:-0}
 BUILD_HOME="${BUILD_HOME:-$HOME}/container-mounts"
 DB_DUMPS=${BUILD_HOME:-$HOME}/db_dumps
 
-APTLY_DATA=${BUILD_HOME:-$HOME}/aptly-test/
+APTLY_DEBIANIZER_DATA=${BUILD_HOME:-$HOME}/aptly-debianizer-test/
+APTLY_S3_DATA=${BUILD_HOME:-$HOME}/aptly-s3-test/
 BUILDSYSTEM_DATA=${BUILD_HOME:-$HOME}/buildsystem-test/
 DEVMETADATA_DATA=${BUILD_HOME:-$HOME}/dev-metadata-test/
 GERRIT_GIT_DATA=${BUILD_HOME:-$HOME}/gerrit-git-data/

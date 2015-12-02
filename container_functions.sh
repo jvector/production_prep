@@ -164,7 +164,8 @@ function run_jenkins {
         -v ${REPO_DATA}:/usr/src/repository \
         -v ${HOME_BUILD_DATA}:/home \
         -v ${MNTBUILD_DATA}:/mnt/build \
-        -v ${APTLY_DATA}:/usr/src/aptly \
+        -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+        -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
         -p 9000:8080 \
@@ -194,7 +195,8 @@ function run_jenchild {
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
     -v ${MNTBUILD_DATA}:/mnt/build \
-    -v ${APTLY_DATA}:/usr/src/aptly \
+    -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+    -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
     --net=${DOCKER_NETWORK} \
@@ -306,7 +308,8 @@ function run_gerrit {
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
     -v ${MNTBUILD_DATA}:/mnt/build \
-    -v ${APTLY_DATA}:/usr/src/aptly \
+    -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+    -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
     -v ${GERRIT_GIT_DATA}:/usr/src/gerrit \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
@@ -475,7 +478,7 @@ function rm_internal_repo {
 function build_merged_repo {
     docker build \
         -t ${MERGED_REPO_IMAGE} \
-        --build-arg SERVER_ROOT=/mnt/aptly \
+        --build-arg SERVER_ROOT=/mnt/aptly-debianizer \
         docker-sw-lighttpd || \
     fail "Building image ${MERGED_REPO_IMAGE} failed"
 }
@@ -484,7 +487,7 @@ function run_merged_repo {
     echo "Starting Merged Repository.."
     docker run \
         --name ${MERGED_REPO_NAME} \
-        -v ${APTLY_DATA}:/mnt/aptly \
+        -v ${APTLY_DEBIANIZER_DATA}:/mnt/aptly-debianizer \
         --net=${DOCKER_NETWORK} \
         -d ${MERGED_REPO_IMAGE}
     echo "Merged repository container ${MERGED_REPO_NAME} running."
@@ -647,7 +650,8 @@ function rm_shared_db_conf {
 # FIXME: Will be removed when all is on BUILDFS and has correct permissions/exists already
 function make_mount_directories {
     for i in \
-        $APTLY_DATA \
+        $APTLY_DEBIANIZER_DATA \
+        $APTLY_S3_DATA \
         $BUILDSYSTEM_DATA \
         $DEVMETADATA_DATA \
         $GERRIT_GIT_DATA \

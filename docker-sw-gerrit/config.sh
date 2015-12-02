@@ -38,7 +38,8 @@ ln -sf /usr/src/buildsystem/gerrithooks/patchset-created /var/gerrit/review_site
 ln -sf /usr/src/buildsystem/gerrithooks/ref-updated /var/gerrit/review_site/hooks/ref-updated
 
 # Link in the aptly config from buildsystem (this one call does it for all containers)
-ln -sf /usr/src/buildsystem/aptly/aptly.conf /usr/src/aptly/aptly.conf
+ln -sf /usr/src/buildsystem/aptly-debianizer/aptly.conf /usr/src/aptly-debianizer/aptly.conf
+ln -sf /usr/src/buildsystem/aptly-s3/aptly.conf /usr/src/aptly-s3/aptly.conf
 
 chown -R  ${GERRIT_USER}:${GERRIT_USER} /var/gerrit/
 

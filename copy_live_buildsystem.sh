@@ -47,7 +47,9 @@ function copy_internal_repo {
 }
 
 function copy_merged_repo {
-	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DATA/
+	# FIXME: Does this get lumped into debianizer or s3?
+	#rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DEBIANIZER_DATA/
+
 	# 65GB
 	# owner build, 755
 }
