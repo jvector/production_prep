@@ -169,6 +169,7 @@ function run_jenkins {
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
         -p 9000:8080 \
+        -p 50000:50000 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
         -e "DEV=${DEV}" \
