@@ -7,7 +7,7 @@
 		"@JENCHILD2@"
 	],
 	"GERRIT":         "@GERRIT@",
-	"GIT_SSH":        "ssh://build@localhost:29418/",
+	"GIT_SSH":        "ssh://build@@HOST@:29418/",
 	"VCS_REPO":       "/usr/src/gerrit/deb/",
 	"DEB_REPO":       "/usr/src/repository/",
 	"METADATA":       "/usr/src/dev-metadata/",

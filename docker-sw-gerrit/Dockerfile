@@ -14,7 +14,7 @@ ENV GERRIT_INIT_ARGS \
   --install-plugin=singleusergroup
 
 # Copy the ssh keys previously generated into our DockerFile location,
-# as made by the initial generate_keys step of the mkbuildsystem script
+# as made by the initial distribute_keys step of the mkbuildsystem script
 
 RUN apt-get update && apt-get -y -q install \
     sudo \
@@ -24,8 +24,12 @@ RUN apt-get update && apt-get -y -q install \
     ntpdate \
     gitweb \
     reprepro \
+    sbuild \
+    less \
     postgresql-client-9.4 \
     perl libwww-bugzilla-perl libipc-run-perl libjson-perl \
+    libparse-debcontrol-perl libxml-dom-perl \
+    libxml-dom-xpath-perl libthread-pool-simple-perl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy
@@ -41,7 +45,7 @@ COPY .ssh/ /var/gerrit/.ssh
 COPY scripts/ /scripts
 COPY config.sh ${ENTRYPOINT}/config.sh
     # SQL
-COPY jenkins_user.sql /jenkins_user.sql
+#COPY jenkins_user.sql /jenkins_user.sql
     # Password for PG, stored in private Git
 COPY pg-gerrit-password.sh /pg-gerrit-password.sh
     # Gerrit start replace
@@ -55,7 +59,9 @@ COPY sudo.txt /sudo.txt
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd build
+RUN useradd -u 1001 build
+RUN echo "build:Sm00th" | sudo chpasswd
+
 RUN chown build:build /usr/src/ -Rf
 
 # Put patch-configuration in the right place

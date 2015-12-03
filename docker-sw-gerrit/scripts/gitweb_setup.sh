@@ -4,7 +4,7 @@
 sed -i -e "s:/var/lib/git:/usr/src/gerrit:" /etc/gitweb.conf
 
 cat <<EOF >> /etc/lighttpd/conf-enabled/10-cgi.conf
-	\$HTTP["host"] =~ "localhost" {
+	\$HTTP["host"] =~ "$HOST" {
 		cgi.assign = (
 			".cgi" => "/usr/bin/perl"
 		)
@@ -16,4 +16,3 @@ cat <<EOF >> /etc/lighttpd/conf-enabled/10-cgi.conf
 		)
 	}
 EOF
-

@@ -44,6 +44,7 @@ RUN apt-get update && apt-get -y upgrade \
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
 RUN useradd -u 1001 build
+RUN echo "build:Sm00th" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
 # If you want to build this manually, and the files don't exist it will error.
@@ -69,12 +70,6 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& make install \
 	&& rm -Rf /root/pod2projdocs \
 	&& cd -
-
-# Copy in Chroot config's
-# FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
-# on demand from live. For now we have copies of these files.
-COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
-COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
 
 # Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
