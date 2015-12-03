@@ -18,7 +18,7 @@ fi
 # defaults to dev unless you've set -d 0
 if [ $DEV -eq 1 ]; then
     HOST=localhost
-    GERRIT_WEBURL=http://$HOST:8080/
+    GERRIT_WEBURL=http://$HOST:8080
 fi
 
 # Set as Host -> localhost if workstation only.
