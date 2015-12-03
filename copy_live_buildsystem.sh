@@ -46,13 +46,13 @@ function copy_internal_repo {
 	# owner build (uid 9000) , 755 on server
 }
 
-function copy_merged_repo {
+# function copy_merged_repo {
 	# FIXME: Does this get lumped into debianizer or s3?
 	#rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DEBIANIZER_DATA/
 
 	# 65GB
 	# owner build, 755
-}
+# }
 
 function copy_common_gerrit_jenkins {
 	copy_internal_repo
