@@ -101,5 +101,6 @@ function copy_dev {
 	echo "Files required are @ ${DEV_COPY}, for now come and find Jon/Victor"
 
 	sudo rsync -avz $DEV_COPY/container-mounts/ $BUILD_HOME
+	sudo chmod 600 $BUILD_HOME/home-build-test/build/.ssh/id_rsa
 	sudo rsync -avz $DEV_COPY/db_dumps/ $DB_DUMPS
 }
