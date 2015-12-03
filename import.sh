@@ -13,15 +13,13 @@ source container_functions.sh
 function reload_jenkins {
 	echo "Telling jenkins to reload"
 	curl -X POST http://127.0.0.1:9000/restart
-	# FIXME: Do this more intelligently. Ping? Poll? something.
-	echo "Waiting for jenkins to reload"
-	sleep 60
+	echo "Jenkins reloading, allow ~20s for it to start up again."
 }
 
 #Gerrit
 
 function reload_gerrit {
-	echo "Restarting Gerrit"
+	echo "Telling Gerrit to restart"
 	docker stop $GERRIT_NAME
 	docker start $GERRIT_NAME
 	echo "Gerrit restarted, allow ~20s for it to start up again."

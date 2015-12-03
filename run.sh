@@ -21,12 +21,12 @@ make_mount_directories
 change_permissions_of_mounts
 
 create_docker_network
-run_jenkins
 run_pg_gerrit
-run_redis
+run_jenkins & \
 run_gerrit
 # run_pg_bugzilla
 # run_bugzilla
+run_redis
 run_buildfs
 run_internal_repo
 run_merged_repo
