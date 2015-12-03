@@ -9,7 +9,7 @@ fi
 cd ..
 # Clone cbuild-secrets
 # FIXME: Should be master when merged
-git clone -b gerrit-containerhost --single-branch https://github.com/Smoothwall/cbuild-secrets.git
+git clone -b gerrit-containerhost --single-branch git@github.com:Smoothwall/cbuild-secrets.git
 
 # Get merge.sh
 ln -s cbuildsystem/merge.sh .
