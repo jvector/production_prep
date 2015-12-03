@@ -66,4 +66,4 @@ service lighttpd start
 # Create a convenience symlink for debootstrap script
 ln -sf /usr/src/buildsystem/templates/debootstrap-smoothwall /usr/share/debootstrap/scripts/smoothwall
 
-set_gerrit_config httpd.listenUrl "proxy-http://${HOST}/r/"
+set_gerrit_config httpd.listenUrl "proxy-http://*:8080/"
