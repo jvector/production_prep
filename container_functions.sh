@@ -158,7 +158,7 @@ function run_jenkins {
     docker run \
         --name ${JENKINS_MASTER_NAME} \
         --privileged \
-        -v ${JENKINS_DATA}:/var/jenkins_home/jobs \
+        -v ${JENKINS_DATA}:/var/jenkins_home \
         -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
         -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
         -v ${REPO_DATA}:/usr/src/repository \
@@ -169,6 +169,7 @@ function run_jenkins {
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
         -p 9000:8080 \
+        -p 49999:49999 \
         -p 50000:50000 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
