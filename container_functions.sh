@@ -158,7 +158,7 @@ function run_jenkins {
     docker run \
         --name ${JENKINS_MASTER_NAME} \
         --privileged \
-        -v ${JENKINS_DATA}:/var/jenkins_home/jobs \
+        -v ${JENKINS_DATA}:/var/jenkins_home \
         -v ${BUILDSYSTEM_DATA}:/usr/src/buildsystem \
         -v ${DEVMETADATA_DATA}:/usr/src/dev-metadata \
         -v ${REPO_DATA}:/usr/src/repository \
