@@ -1,6 +1,9 @@
 #!/bin/bash
 # Copyright Smoothwall Ltd 2015
 
+# For tmpfs optimization
+mount -a
+
 USER=build
 
 # A lot of files get copied in as root. To avoid any conflicts, here we 

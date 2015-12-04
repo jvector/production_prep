@@ -110,4 +110,7 @@ RUN ln -s /usr/src/buildsystem/sbuildhooks/sbuild-hook-addbuilduser /etc/schroot
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
 
+# tmpfs optimization - requires a mount -a in start script
+COPY fstab /etc/fstab
+
 CMD ["/jenkins-start.sh"]

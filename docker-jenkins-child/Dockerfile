@@ -96,4 +96,7 @@ EXPOSE 9500
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
 
+# tmpfs optimization - requires a mount -a in start script
+COPY fstab /etc/fstab
+
 CMD ["/jenkins-child-start.sh"]
