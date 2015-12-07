@@ -177,6 +177,7 @@ function run_jenkins {
         -v ${HOME_BUILD_DATA}:/home \
         -v ${MNTBUILD_DATA}:/mnt/build \
         -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+        -v ${APTLY_DEBIANIZER_SERVE_DATA}:/usr/src/aptly-debianizer-serve \
         -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
@@ -210,6 +211,7 @@ function run_jenchild {
     -v ${HOME_BUILD_DATA}:/home \
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+    -v ${APTLY_DEBIANIZER_SERVE_DATA}:/usr/src/aptly-debianizer-serve \
     -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
@@ -525,7 +527,7 @@ function rm_internal_repo {
 function build_merged_repo {
     docker build \
         -t ${MERGED_REPO_IMAGE} \
-        --build-arg SERVER_ROOT=/mnt/aptly-debianizer \
+        --build-arg SERVER_ROOT=/mnt/aptly-debianizer-serve/live \
         docker-sw-lighttpd || \
     fail "Building image ${MERGED_REPO_IMAGE} failed"
 }
@@ -534,7 +536,7 @@ function run_merged_repo {
     echo "Starting Merged Repository.."
     docker run \
         --name ${MERGED_REPO_NAME} \
-        -v ${APTLY_DEBIANIZER_DATA}:/mnt/aptly-debianizer \
+        -v ${APTLY_DEBIANIZER_SERVE_DATA}:/mnt/aptly-debianizer-serve \
         --net=${DOCKER_NETWORK} \
         -d ${MERGED_REPO_IMAGE}
     echo "Merged repository container ${MERGED_REPO_NAME} running."
