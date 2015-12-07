@@ -15,6 +15,8 @@ else
 	source $DEFAULTS_FILE
 fi
 
+source passwords.sh
+
 # defaults to dev unless you've set -d 0
 if [ $DEV -eq 1 ]; then
     HOST=localhost
@@ -36,6 +38,10 @@ PG_GERRIT_DATA=${PG_GERRIT_DATA:-/var/lib/containers/${PG_GERRIT_IMAGE}}
 REDIS_IMAGE=redis:3.0.5
 REDIS_NAME=${REDIS_NAME:-redis-container}
 REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
+
+# Postfix
+POSTFIX_IMAGE=catatnight/postfix
+POSTFIX_NAME=${POSTFIX_NAME:-postfix-container}
 
 # Gerrit
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
@@ -292,6 +298,32 @@ function rm_redis {
     docker rm -v ${REDIS_NAME}
 }
 
+### Postfix
+# Postfix does not have a build step, we use catatnight/postfix as is.
+
+function run_postfix {
+    echo "Starting Postfix ..."
+    docker run \
+        --name ${POSTFIX_NAME} \
+        -p 250:25 \
+        -e maildomain=gerrit.container.soton.smoothwall.net \
+        -e smtp_user=gerrit2:${POSTFIX_PASSWORD} \
+        --net=${DOCKER_NETWORK} \
+        -d ${POSTFIX_IMAGE}
+}
+
+function start_postfix {
+    docker start ${POSTFIX_NAME}
+}
+
+function stop_postfix {
+    docker stop ${POSTFIX_NAME}
+}
+
+function rm_postfix {
+    docker rm ${POSTFIX_NAME}
+}
+
 ### Gerrit (+extras)
 
 function build_gerrit {
@@ -323,6 +355,10 @@ function run_gerrit {
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e REDIS_HOSTNAME=${REDIS_NAME} \
     -e HOST=${HOST} \
+    -e SMTP_SERVER=${POSTFIX_NAME} \
+    -e SMTP_USER=gerrit2 \
+    -e SMTP_PASS=${POSTFIX_PASSWORD} \
+    -e SMTP_SERVER_PORT=25 \
     --net=${DOCKER_NETWORK} \
     -d ${GERRIT_IMAGE}
 

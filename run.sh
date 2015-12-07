@@ -27,6 +27,7 @@ run_gerrit
 # run_pg_bugzilla
 # run_bugzilla
 run_redis
+run_postfix
 run_buildfs
 run_internal_repo
 run_merged_repo
