@@ -3,6 +3,8 @@
 FROM jenkins:1.609.3
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
+ARG BUILD_USER_PASSWORD
+
 USER root
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -88,7 +90,7 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 
 # Create build user, let it use /usr/src/. Allow jenkins also
 RUN useradd -u 1001 build
-RUN echo "build:Sm00th" | sudo chpasswd
+RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf
 

@@ -139,15 +139,21 @@ function rm_docker_network {
 
 function build_jenkins_master {
     # Master
-    docker build -t ${JENKINS_MASTER_IMAGE} docker-jenkins-master || \
-           fail "Building image ${JENKINS_MASTER_IMAGE} failed"
+    docker build \
+        -t ${JENKINS_MASTER_IMAGE} \
+        --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
+        docker-jenkins-master \
+    || fail "Building image ${JENKINS_MASTER_IMAGE} failed"
 }
 
 function build_jenkins {
 # Assuming to build children -> master at the same time, maybe change
     # Child
-    docker build -t ${JENKINS_CHILD_IMAGE} docker-jenkins-child || \
-           fail "Building image ${JENKINS_CHILD_IMAGE} failed"
+    docker build \
+        -t ${JENKINS_CHILD_IMAGE} \
+        --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
+        docker-jenkins-child \
+    || fail "Building image ${JENKINS_CHILD_IMAGE} failed"
     # Master
     build_jenkins_master
 }
@@ -327,8 +333,11 @@ function rm_postfix {
 ### Gerrit (+extras)
 
 function build_gerrit {
-    docker build -t ${GERRIT_IMAGE} docker-sw-gerrit || \
-           fail "Building image ${GERRIT_IMAGE} failed"
+    docker build \
+        -t ${GERRIT_IMAGE} \
+        --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
+        docker-sw-gerrit \
+    || fail "Building image ${GERRIT_IMAGE} failed"
 }
 
 function run_gerrit {
