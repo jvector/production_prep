@@ -13,6 +13,7 @@ BUILD_HOME="${BUILD_HOME:-$HOME}/container-mounts"
 DB_DUMPS=${BUILD_HOME:-$HOME}/db_dumps
 
 APTLY_DEBIANIZER_DATA=${BUILD_HOME:-$HOME}/aptly-debianizer-test/
+APTLY_DEBIANIZER_SERVE_DATA=${BUILD_HOME:-$HOME}/aptly-debianizer-serve-test/
 APTLY_S3_DATA=${BUILD_HOME:-$HOME}/aptly-s3-test/
 BUILDSYSTEM_DATA=${BUILD_HOME:-$HOME}/buildsystem-test/
 DEVMETADATA_DATA=${BUILD_HOME:-$HOME}/dev-metadata-test/
