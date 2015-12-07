@@ -11,6 +11,7 @@ RUN apt-get update && apt-get -y upgrade \
 					default-jre \
 					build-essential \
 					git \
+					rsync \
 					openssh-server \
 					ntpdate \
 					rpcbind \
