@@ -19,6 +19,7 @@ BUILDSYSTEM_DATA=${BUILD_HOME:-$HOME}/buildsystem-test/
 DEVMETADATA_DATA=${BUILD_HOME:-$HOME}/dev-metadata-test/
 GERRIT_GIT_DATA=${BUILD_HOME:-$HOME}/gerrit-git-data/
 HOME_BUILD_DATA=${BUILD_HOME:-$HOME}/home-build-test/
+VAR_GERRIT_SSH_DATA=${BUILD_HOME:-$HOME}/var-gerrit-ssh-test/
 JENKINS_DATA=${BUILD_HOME:-$HOME}/jenkins-test/
 MNTBUILD_DATA=${BUILD_HOME:-$HOME}/mnt-build-test/
 PG_BUGZILLA_DATA=${BUILD_HOME:-$HOME}/pg-bugzilla-test/

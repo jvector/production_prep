@@ -62,6 +62,7 @@ The cbuildsystem Containers create/use some directories on the host as per the d
 * **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
 * **GERRIT_GIT_DATA** - Stores Gerrit's /usr/src/gerrit directory
 * **HOME_BUILD_DATA** - Stores a shared /home/build/ between containers
+* **VAR_GERRIT_SSH_DATA** - Stores a persistant /var/gerrit/.ssh for the gerrit-container
 * **JENKINS_DATA** - Stores Jenkins home directory (including jobs/views/build history)
 * **MNTBUILD_DATA** - Stores a shared /mnt/build between containers
 * **PG_BUGZILLA_DATA** - Stores Postgresql Database used by Bugzilla
