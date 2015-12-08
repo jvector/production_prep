@@ -140,16 +140,25 @@ function build_jenkins_master {
 function build_jenkins {
 # Assuming to build children -> master at the same time, maybe change
     # Child
-    docker build -t ${JENKINS_CHILD_IMAGE} docker-jenkins-child || \
-           fail "Building image ${JENKINS_CHILD_IMAGE} failed"
-    # Master
+	build_jenchild 1
+	build_jenchild 2
     build_jenkins_master
+}
+
+function build_jenchild {
+	CHILD_SEQ=$1
+	docker build \
+		   -t ${JENKINS_CHILD_IMAGE}${CHILD_SEQ} \
+		   --build-arg CHILD_SEQ=$CHILD_SEQ \
+		   docker-jenkins-child \
+		|| fail "Building image ${JENKINS_CHILD_IMAGE} failed"
 }
 
 function run_jenkins {
     echo "Waking up child nodes.."
-    run_jenchild $JENKINS_CHILD1_NAME
-    run_jenchild $JENKINS_CHILD2_NAME
+	# second arg is a hack because we need to give each child container
+    run_jenchild $JENKINS_CHILD1_NAME 1
+    run_jenchild $JENKINS_CHILD2_NAME 2
 
     wait $JENKINS_CHILD1_NAME "Starting Jenkins Child"
     wait $JENKINS_CHILD2_NAME "Starting Jenkins Child"
@@ -189,6 +198,7 @@ function run_jenkins {
 
 function run_jenchild {
     CHILD_NAME=$1
+	CHILD_SEQ=$2
     docker run \
     --name=${CHILD_NAME} \
     --privileged \
@@ -202,8 +212,9 @@ function run_jenchild {
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
     --net=${DOCKER_NETWORK} \
-    -d ${JENKINS_CHILD_IMAGE}
+	-d ${JENKINS_CHILD_IMAGE}${CHILD_SEQ}
 }
+
 
 function start_jenkins {
     docker start ${JENKINS_MASTER_NAME}

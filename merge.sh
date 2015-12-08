@@ -34,6 +34,13 @@ fi
 rm -rf cbuildsystem-merged/
 mkdir cbuildsystem-merged
 cp -ar cbuildsystem/*        cbuildsystem-merged/
+
+# We are not able to save permissions in gitHub ... the secret files
+# come down as default 644 perms which stops ssh starting so we need
+# to force the perms back to 600
+
+find cbuild-secrets -name ssh_host_\*key -exec chmod 600 {} \;
+
 cp -ar cbuild-secrets/.     cbuildsystem-merged/
 
 echo "Finished"
