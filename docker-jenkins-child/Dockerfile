@@ -47,7 +47,7 @@ RUN apt-get update && apt-get -y upgrade \
 # nfs-common, portmap
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
-RUN useradd -u 1001 build
+RUN useradd -s /bin/bash -u 1001 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
