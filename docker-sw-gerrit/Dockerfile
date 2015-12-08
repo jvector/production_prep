@@ -15,9 +15,6 @@ ENV GERRIT_INIT_ARGS \
   --install-plugin=reviewnotes \
   --install-plugin=singleusergroup
 
-# Copy the ssh keys previously generated into our DockerFile location,
-# as made by the initial distribute_keys step of the mkbuildsystem script
-
 RUN apt-get update && apt-get -y -q install \
     sudo \
     libredis-perl \
@@ -56,6 +53,8 @@ COPY gerrit-start.sh /gerrit-start.sh
 COPY apt-keys /var/lib/sbuild/apt-keys
     # Ssh config for gerrit2
 COPY ssh_config /var/gerrit/.ssh/config
+	# /etc/ssh for persistent host
+COPY etc_ssh/ /etc/ssh
 	# Extra's
 COPY sudo.txt /sudo.txt
 
