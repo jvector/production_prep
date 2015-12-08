@@ -14,6 +14,7 @@ RUN apt-get update && apt-get -y upgrade \
 					openssh-server \
 					ntpdate \
 					build-essential \
+					rsync \
 					doxygen reprepro \
 					sbuild git-buildpackage dh-autoreconf liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
@@ -87,6 +88,8 @@ RUN /usr/local/bin/plugins.sh /plugins.txt
 #COPY pluginjars/ /usr/share/jenkins/ref/plugins
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
+	# /etc/ssh for persistent host
+COPY etc_ssh/ /etc/ssh
 
 # Create build user, let it use /usr/src/. Allow jenkins also
 RUN useradd -u 1001 build

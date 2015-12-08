@@ -4,6 +4,7 @@ FROM debian:jessie
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
 ARG BUILD_USER_PASSWORD
+ARG CHILD_SEQ
 
 # Prevents invoke-rc.d errors
 RUN sed -i -e "s/^exit 101$/exit 0/" /usr/sbin/policy-rc.d
@@ -13,6 +14,7 @@ RUN apt-get update && apt-get -y upgrade \
 					default-jre \
 					build-essential \
 					git \
+					rsync \
 					openssh-server \
 					ntpdate \
 					rpcbind \
@@ -83,6 +85,9 @@ COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 # sbuild user config
 RUN sbuild-adduser build
 COPY .sbuildrc /home/build/.sbuildrc
+
+	# /etc/ssh for persistent host
+COPY etc_ssh$CHILD_SEQ/ /etc/ssh
 
 # Install aptly
 RUN /usr/src/aptly_setup.sh
