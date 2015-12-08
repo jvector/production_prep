@@ -56,6 +56,7 @@ The data stored in $BUILD_HOME is left untouched by these scripts, so that it ca
 The cbuildsystem Containers create/use some directories on the host as per the defaults file, these are.
 
 * **APTLY_DEBIANIZER_DATA** - Stores a shared /usr/src/aptly-debianizer between containers
+* **APTLY_DEBIANIZER-SERVE_DATA** - Stores a shared /usr/src/aptly-debianizer-serve between containers
 * **APTLY_S3_DATA** - Stores a shared /usr/src/aptly-s3 between containers
 * **BUILDSYSTEM_DATA** - Stores a shared /usr/src/buildsystem/ between containers
 * **DEVMETADATA_DATA** - Stores a shared /usr/src/dev-metadata/ between containers
