@@ -186,7 +186,6 @@ function run_jenkins {
         -p 50000:50000 \
         -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
-        -e "DEV=${DEV}" \
         -e "JENCHILD1_HOSTNAME=${JENKINS_CHILD1_NAME}" \
         -e "JENCHILD2_HOSTNAME=${JENKINS_CHILD2_NAME}" \
         -e "JENCHILD1_EXECUTORS=2" \
