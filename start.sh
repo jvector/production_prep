@@ -22,6 +22,7 @@ start_jenkins
 start_pg_gerrit
 	sleep 60
 start_redis
+start_postfix
 start_gerrit
 # start_pg_bugzilla
 	#sleep 60

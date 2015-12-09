@@ -18,6 +18,7 @@ echo "############# $(date ) REMOVING CONTAINERS ##############"
 rm_jenkins
 rm_pg_gerrit
 rm_redis
+rm_postfix
 rm_gerrit
 # rm_pg_bugzilla
 # rm_bugzilla

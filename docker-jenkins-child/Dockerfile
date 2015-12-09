@@ -3,6 +3,7 @@
 FROM debian:jessie
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
+ARG BUILD_USER_PASSWORD
 ARG CHILD_SEQ
 
 # Prevents invoke-rc.d errors
@@ -47,7 +48,7 @@ RUN apt-get update && apt-get -y upgrade \
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
 RUN useradd -u 1001 build
-RUN echo "build:Sm00th" | sudo chpasswd
+RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
 # If you want to build this manually, and the files don't exist it will error.
@@ -101,5 +102,8 @@ EXPOSE 9500
 
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
+
+# tmpfs optimization - requires a mount -a in start script
+COPY fstab /etc/fstab
 
 CMD ["/jenkins-child-start.sh"]

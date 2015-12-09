@@ -4,3 +4,4 @@ chroot/*
 chroot.d/*
 smoothwall/*
 .sbuildrc
+fstab

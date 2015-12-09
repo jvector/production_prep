@@ -15,6 +15,8 @@ else
 	source $DEFAULTS_FILE
 fi
 
+source passwords.sh
+
 # defaults to dev unless you've set -d 0
 if [ $DEV -eq 1 ]; then
     HOST=localhost
@@ -36,6 +38,10 @@ PG_GERRIT_DATA=${PG_GERRIT_DATA:-/var/lib/containers/${PG_GERRIT_IMAGE}}
 REDIS_IMAGE=redis:3.0.5
 REDIS_NAME=${REDIS_NAME:-redis-container}
 REDIS_DATA=${REDIS_DATA:-/var/lib/containers/${REDIS_IMAGE}}
+
+# Postfix
+POSTFIX_IMAGE=catatnight/postfix
+POSTFIX_NAME=${POSTFIX_NAME:-postfix-container}
 
 # Gerrit
 GERRIT_IMAGE=${GERRIT_IMAGE:-sw/gerrit}
@@ -133,8 +139,11 @@ function rm_docker_network {
 
 function build_jenkins_master {
     # Master
-    docker build -t ${JENKINS_MASTER_IMAGE} docker-jenkins-master || \
-           fail "Building image ${JENKINS_MASTER_IMAGE} failed"
+    docker build \
+        -t ${JENKINS_MASTER_IMAGE} \
+        --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
+        docker-jenkins-master \
+    || fail "Building image ${JENKINS_MASTER_IMAGE} failed"
 }
 
 function build_jenkins {
@@ -145,10 +154,11 @@ function build_jenkins {
     build_jenkins_master
 }
 
-function build_jenchild {
+unction build_jenchild {
 	CHILD_SEQ=$1
 	docker build \
 		   -t ${JENKINS_CHILD_IMAGE}${CHILD_SEQ} \
+           --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
 		   --build-arg CHILD_SEQ=$CHILD_SEQ \
 		   docker-jenkins-child \
 		|| fail "Building image ${JENKINS_CHILD_IMAGE} failed"
@@ -174,6 +184,7 @@ function run_jenkins {
         -v ${HOME_BUILD_DATA}:/home \
         -v ${MNTBUILD_DATA}:/mnt/build \
         -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+        -v ${APTLY_DEBIANIZER_SERVE_DATA}:/usr/src/aptly-debianizer-serve \
         -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
         -v ${SRV_CHROOT_DATA}:/srv/chroot \
         -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
@@ -208,6 +219,7 @@ function run_jenchild {
     -v ${HOME_BUILD_DATA}:/home \
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
+    -v ${APTLY_DEBIANIZER_SERVE_DATA}:/usr/src/aptly-debianizer-serve \
     -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
     -v ${SRV_CHROOT_DATA}:/srv/chroot \
     -v ${ETC_SCHROOT_CHROOTD}:/etc/schroot/chroot.d \
@@ -303,11 +315,40 @@ function rm_redis {
     docker rm -v ${REDIS_NAME}
 }
 
+### Postfix
+# Postfix does not have a build step, we use catatnight/postfix as is.
+
+function run_postfix {
+    echo "Starting Postfix ..."
+    docker run \
+        --name ${POSTFIX_NAME} \
+        -p 250:25 \
+        -e maildomain=gerrit.container.soton.smoothwall.net \
+        -e smtp_user=gerrit2:${POSTFIX_PASSWORD} \
+        --net=${DOCKER_NETWORK} \
+        -d ${POSTFIX_IMAGE}
+}
+
+function start_postfix {
+    docker start ${POSTFIX_NAME}
+}
+
+function stop_postfix {
+    docker stop ${POSTFIX_NAME}
+}
+
+function rm_postfix {
+    docker rm ${POSTFIX_NAME}
+}
+
 ### Gerrit (+extras)
 
 function build_gerrit {
-    docker build -t ${GERRIT_IMAGE} docker-sw-gerrit || \
-           fail "Building image ${GERRIT_IMAGE} failed"
+    docker build \
+        -t ${GERRIT_IMAGE} \
+        --build-arg BUILD_USER_PASSWORD=${BUILD_USER_PASSWORD} \
+        docker-sw-gerrit \
+    || fail "Building image ${GERRIT_IMAGE} failed"
 }
 
 function run_gerrit {
@@ -334,6 +375,10 @@ function run_gerrit {
     -e DATABASE_HOSTNAME=${PG_GERRIT_NAME} \
     -e REDIS_HOSTNAME=${REDIS_NAME} \
     -e HOST=${HOST} \
+    -e SMTP_SERVER=${POSTFIX_NAME} \
+    -e SMTP_USER=gerrit2 \
+    -e SMTP_PASS=${POSTFIX_PASSWORD} \
+    -e SMTP_SERVER_PORT=25 \
     --net=${DOCKER_NETWORK} \
     -d ${GERRIT_IMAGE}
 
@@ -491,7 +536,7 @@ function rm_internal_repo {
 function build_merged_repo {
     docker build \
         -t ${MERGED_REPO_IMAGE} \
-        --build-arg SERVER_ROOT=/mnt/aptly-debianizer \
+        --build-arg SERVER_ROOT=/mnt/aptly-debianizer-serve/live \
         docker-sw-lighttpd || \
     fail "Building image ${MERGED_REPO_IMAGE} failed"
 }
@@ -500,7 +545,7 @@ function run_merged_repo {
     echo "Starting Merged Repository.."
     docker run \
         --name ${MERGED_REPO_NAME} \
-        -v ${APTLY_DEBIANIZER_DATA}:/mnt/aptly-debianizer \
+        -v ${APTLY_DEBIANIZER_SERVE_DATA}:/mnt/aptly-debianizer-serve \
         --net=${DOCKER_NETWORK} \
         -d ${MERGED_REPO_IMAGE}
     echo "Merged repository container ${MERGED_REPO_NAME} running."

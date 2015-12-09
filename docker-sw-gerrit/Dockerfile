@@ -3,6 +3,8 @@
 FROM openfrontier/gerrit:latest
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
+ARG BUILD_USER_PASSWORD
+
 # We've already got Gerrit ready to roll, we just need to futz with it a bit.
 ENV ENTRYPOINT /docker-entrypoint-init.d
 
@@ -59,7 +61,7 @@ COPY sudo.txt /sudo.txt
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
 RUN useradd -u 1001 build
-RUN echo "build:Sm00th" | sudo chpasswd
+RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf
 

@@ -18,6 +18,7 @@ echo "############# $(date ) STOPPING CONTAINERS ##############"
 stop_jenkins
 stop_pg_gerrit
 stop_redis
+stop_postfix
 stop_gerrit
 # stop_pg_bugzilla
 # stop_bugzilla
