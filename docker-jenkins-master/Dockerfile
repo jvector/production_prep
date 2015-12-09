@@ -72,27 +72,14 @@ COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 	# Circumvent this by copying manually from one level up, or run copy_shared in
 	# container_functions.sh
 COPY shared /usr/src/
-	#Plugins
-COPY plugins/ ${JENKINS_HOME}/plugins
-COPY plugins.txt /plugins.txt
-	#Config files
-COPY config_files/ ${JENKINS_HOME}
-	#Scripts
-COPY scripts/ /scripts
 COPY jenkins-start.sh /
-	# Jenkins plugin's
-	# This could also be done by passing plugins.txt to plugins.sh,
-	# but that requires redownloading all the plugins (which don't change)
-	# each time it is built
-RUN /usr/local/bin/plugins.sh /plugins.txt
-#COPY pluginjars/ /usr/share/jenkins/ref/plugins
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 	# /etc/ssh for persistent host
 COPY etc_ssh/ /etc/ssh
 
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd -u 1001 build
+RUN useradd -s /bin/bash -u 1001 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf
@@ -103,7 +90,6 @@ RUN mv /usr/src/patch-configuration.json /etc/patch-configuration.json
 # Install aptly
 RUN /usr/src/aptly_setup.sh
 
-# For now this is jenkins, might need changing to build.
 # sbuild user config
 RUN sbuild-adduser build
 COPY .sbuildrc /home/build/.sbuildrc
