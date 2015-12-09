@@ -1,19 +1,43 @@
-Dockerized Jenkins Master node.
+## cbuildsystem - docker-jenkins-master
 
-Full build instructions can be seen in the Dockerfile. 
+### About this image
 
-Contents of /config_files gets put in /var/jenkins_home/
-			/scripts gets put in /
-			/plugins go in /var/jenkins_home/plugins/
-			/shared_src goes in /usr/src/
-				(At make time, shared_src is copied in from one directory up)
+This image is used for our Jenkins Master node, it is based from the official jenkins:1.609.3 image. [see more](https://hub.docker.com/_/jenkins/)
 
-The contents of .ssh are created and configured when you run mkbuildsystem.sh,
-if you wish to run this without using mkbuildsystem copy the steps within to
-generate keys which match.
+We add to it all the required packages/perl modules needed to execute Jenkins jobs.
 
-If you want to add a plugin, download the jpi/hpi and put it inside /pluginjars/,
-if you need this pinned to a specific version touch a .pinned into /plugins/
+There are some common files between Jenkins Master and Jenkins Children, these are stored in common_jenkins. There are also some shared files between Jenmaster, Jenchildren and Gerrit in shared. When you run `build.sh` the contents of these get copied into the build contexts of both. If you wish to build this image without using the scripts you will need to make sure the contents of common_jenkins & shared are already copied.
 
-Ensure that all files / scripts in the scripts folder are executable, the Dockefile
-copies them as is and won't error if they don't run.
+### Build example
+
+```
+docker build \
+    -t <image-name> \
+    --build-arg BUILD_USER_PASSWORD=<build-user-password> \
+    docker-jenkins-master
+```
+
+###### Notes
+You **must** provide build argument **BUILD_USER_PASSWORD**
+* **BUILD_USER_PASSWORD** is the password you want the containers build user to have.
+
+### Run example
+```
+docker run \
+        --name <container-name> \
+        --privileged \
+        -v /some/local/dir:/var/jenkins_home \
+        -p 9000:8080 \
+        -p 49999:49999 \
+        -p 50000:50000 \
+        --net=<custom-docker-network> \
+        -d <image-name>
+```
+###### Notes
+* **--privileged** flag is essential to allow the container to use hosts devices (i.e. do anything with chroots)
+* We volume mount a lot of different things to get our buildsystem to work (none are essential, but /var/jenkins_home is recommended), see `container_functions.sh` for a full example.
+* If you **dont** mount a pre populated local dir to /var/jenkins_home any changes made **wont** persist between container restarts.
+* Ports - Internal port 8080 is for the WebUI, 49999 we use (set up in config files copied into the /var/jenkins_home mount) for Jenkins SSH and 50000 (set up by the jenkins image) is for communicating with jenchildren nodes.
+
+### Extras
+The official jenkins image contains a really nice way to install plugins by simply providing a text file, however because the script is ran at build time, and we volume mount ontop of /var/jenkins_home at run time we no longer use this.
