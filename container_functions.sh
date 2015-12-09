@@ -154,7 +154,7 @@ function build_jenkins {
     build_jenkins_master
 }
 
-unction build_jenchild {
+function build_jenchild {
 	CHILD_SEQ=$1
 	docker build \
 		   -t ${JENKINS_CHILD_IMAGE}${CHILD_SEQ} \
