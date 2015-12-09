@@ -361,6 +361,7 @@ function run_gerrit {
     -v ${REPO_DATA}:/usr/src/repository \
     -v ${HOME_BUILD_DATA}:/home \
     -v ${VAR_GERRIT_SSH_DATA}:/var/gerrit/.ssh \
+    -v ${GERRIT_DATA}:/var/gerrit/review_site \
     -v ${MNTBUILD_DATA}:/mnt/build \
     -v ${APTLY_DEBIANIZER_DATA}:/usr/src/aptly-debianizer \
     -v ${APTLY_S3_DATA}:/usr/src/aptly-s3 \
@@ -715,6 +716,7 @@ function make_mount_directories {
         $GERRIT_GIT_DATA \
         $HOME_BUILD_DATA \
         $VAR_GERRIT_SSH_DATA \
+        $GERRIT_DATA \
         $JENKINS_DATA \
         $MNTBUILD_DATA \
         $PG_BUGZILLA_DATA \
@@ -737,7 +739,7 @@ function change_permissions_of_mounts {
     # chroot's in srv-chroot & chroot config's in etc-schroot need to be root
     sudo chown -R 0:0 $ETC_SCHROOT_CHROOTD $SRV_CHROOT_DATA
     # And git's & gerrits ssh need to be owned by Gerrit2
-    sudo chown -R $GERRIT2_USER_UID:$GERRIT2_USER_UID $GERRIT_GIT_DATA $VAR_GERRIT_SSH_DATA
+    sudo chown -R $GERRIT2_USER_UID:$GERRIT2_USER_UID $GERRIT_GIT_DATA $VAR_GERRIT_SSH_DATA $GERRIT_DATA
     # And postgres needs to be postgres User
     sudo chown -R $POSTGRES_USER_UID:$POSTGRES_USER_UID $PG_GERRIT_DATA $PG_BUGZILLA_DATA
 }
