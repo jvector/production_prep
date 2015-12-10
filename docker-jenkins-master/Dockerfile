@@ -15,6 +15,7 @@ RUN apt-get update && apt-get -y upgrade \
 					ntpdate \
 					build-essential \
 					rsync \
+					genisoimage \
 					doxygen reprepro \
 					sbuild git-buildpackage dh-autoreconf liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
