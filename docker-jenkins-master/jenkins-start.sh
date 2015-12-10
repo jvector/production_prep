@@ -4,6 +4,9 @@
 # For tmpfs optimization
 mount -a
 
+# Add a few extra's to sudo
+cat /usr/src/sudo.txt >> /etc/sudoers
+
 USER=build
 
 # A lot of files get copied in as root. To avoid any conflicts, here we 
