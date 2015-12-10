@@ -106,4 +106,7 @@ RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
 # tmpfs optimization - requires a mount -a in start script
 COPY fstab /etc/fstab
 
+# For the workspaces
+RUN mkdir -p /var/lib/jenkins
+
 CMD ["/jenkins-child-start.sh"]
