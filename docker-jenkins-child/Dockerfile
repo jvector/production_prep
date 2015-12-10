@@ -19,6 +19,7 @@ RUN apt-get update && apt-get -y upgrade \
 					ntpdate \
 					rpcbind \
 					sbuild \
+					genisoimage \
 					doxygen reprepro \
 					git-buildpackage liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \

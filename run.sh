@@ -17,8 +17,10 @@ done
 
 source container_functions.sh
 
-make_mount_directories
-change_permissions_of_mounts
+if [ $DEV = 1 ]; then
+	make_mount_directories
+	change_permissions_of_mounts
+fi
 
 create_docker_network
 run_pg_gerrit

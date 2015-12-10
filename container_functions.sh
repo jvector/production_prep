@@ -725,7 +725,7 @@ function make_mount_directories {
         $SRV_CHROOT_DATA \
         $ETC_SCHROOT_CHROOTD \
         ; do
-            mkdir -p $i
+            [ -e $i ] || mkdir -p $i
     done
 }
 
