@@ -7,6 +7,9 @@ mount -a
 # Add a few extra's to sudo
 cat /usr/src/sudo.txt >> /etc/sudoers
 
+# Create a convenience symlink for debootstrap script
+ln -sf /usr/src/buildsystem/templates/debootstrap-smoothwall /usr/share/debootstrap/scripts/smoothwall
+
 USER=build
 
 # A lot of files get copied in as root. To avoid any conflicts, here we 
