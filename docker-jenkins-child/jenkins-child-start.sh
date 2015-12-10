@@ -3,6 +3,9 @@
 
 set -e
 
+# Add a few extra's to sudo
+cat /usr/src/sudo.txt >> /etc/sudoers
+
 # For tmpfs optimization
 mount -a
 

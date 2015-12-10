@@ -55,8 +55,6 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 COPY ssh_config /var/gerrit/.ssh/config
 	# /etc/ssh for persistent host
 COPY etc_ssh/ /etc/ssh
-	# Extra's
-COPY sudo.txt /sudo.txt
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
