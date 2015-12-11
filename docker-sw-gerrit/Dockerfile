@@ -58,7 +58,7 @@ COPY etc_ssh/ /etc/ssh
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd -s /bin/bash -u 1001 build
+RUN useradd -s /bin/bash -u 9000 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf
