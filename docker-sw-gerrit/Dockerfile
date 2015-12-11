@@ -25,6 +25,8 @@ RUN apt-get update && apt-get -y -q install \
     reprepro \
     sbuild \
     less \
+    screen \
+    tmux \
     postgresql-client-9.4 \
     perl libwww-bugzilla-perl libipc-run-perl libjson-perl \
     libparse-debcontrol-perl libxml-dom-perl \
