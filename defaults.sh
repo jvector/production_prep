@@ -12,7 +12,7 @@ DEV=${DEV:-0}
 BUILD_HOME="${BUILD_HOME:-$HOME}/buildfs-mounts"
 DB_DUMPS=${BUILD_HOME:-$HOME}/db_dumps
 
-MNTBUILD_DATA=${BUILD_HOME:-$HOME}/mnt-build-test/
+MNTBUILD_DATA=${BUILD_HOME:-$HOME}/mnt-build/
 
 APTLY_DEBIANIZER_DATA=${BUILD_HOME:-$HOME}/container_data/aptly-debianizer
 APTLY_DEBIANIZER_SERVE_DATA=${BUILD_HOME:-$HOME}/container_data/aptly-debianizer-serve
