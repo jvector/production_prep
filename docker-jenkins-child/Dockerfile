@@ -108,6 +108,6 @@ RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
 COPY fstab /etc/fstab
 
 # For the workspaces
-RUN mkdir -p /var/lib/jenkins
+RUN mkdir -p /var/lib/jenkins && chown 9000:9000 /var/lib/jenkins
 
 CMD ["/jenkins-child-start.sh"]
