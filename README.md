@@ -32,7 +32,7 @@ In order to setup dev env on your local you'll need to do the following:
 	git clone git@github.com:[YOUR GITHUB ACCOUNT]/cbuildsystem.git /path/to/your/local/repos/cbuildsystem
 	```
 
-* Currently all development happens on the gerrit-containers branch. So this needs to be checked out:
+* Currently all development happens on the gerrit-containerhost branch. So this needs to be checked out:
 
 	```
 	git checkout gerrit-containerhost
@@ -74,18 +74,20 @@ In order to setup dev env on your local you'll need to do the following:
 	./build.sh
 	```
 	This script will complete the following actions:
-		* copy the content of the shared folder into jenkins and gerrit locations
-		* copy the ```.gnupg``` file
-		* copy the apt-keys into the the jenkins children, master and gerrit locations
-		* copy the ```common_jenkins``` folder into jenkins children and master locations
-		* copy the shared_db_conf content into gerrit and bugzilla locations
-		* Run build process of the containers:
-			* postgresql for gerrit and gerrit
-			* jenkins
-			* buildfs
-			* insternal_repo
-			* merged_repo
-			* reverse_proxy
+	* copy the content of the shared folder into jenkins and gerrit locations
+	* copy the ```.gnupg``` file
+	* copy the apt-keys into the the jenkins children, master and gerrit locations
+	* copy the ```common_jenkins``` folder into jenkins children and master locations
+	* copy the shared_db_conf content into gerrit and bugzilla locations
+	* Run build process of the containers:
+		* postgresql for gerrit and gerrit
+		* jenkins
+		* buildfs
+		* internal_repo
+		* merged_repo
+		* reverse_proxy
+
+	On a fresh machine build step takes ~40 mins, as it has to pull generic docker images and install the required dependencies.
 
 * After build has completed it's time to run the containers. Before you do that make sure you're not running any of the containers. In order to do that run:
 	```
@@ -107,7 +109,7 @@ In order to setup dev env on your local you'll need to do the following:
 	* redis
 	* postfix
 	* buildfs
-	* internal_repo
+	* insternal_repo
 	* merged_repo
 	* reverse_proxy
 
