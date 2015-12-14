@@ -100,7 +100,8 @@ function copy_dev {
 	DEV_COPY=/global/users/jonathan.barron/cbuildsystem-starter-pack
 	echo "Files required are @ ${DEV_COPY}, for now come and find Jon/Victor"
 
-	sudo rsync -avz $DEV_COPY/container-mounts/ $BUILD_HOME
-	sudo chmod 600 $BUILD_HOME/home/build/.ssh/id_rsa
+	sudo rsync -avz $DEV_COPY/container-mounts/ $BUILD_HOME_CONT
+	sudo chmod 600 $BUILD_HOME_CONT/home/build/.ssh/id_rsa
+	sudo rsync -avz $DEV_COPY/buildfs-mounts/mnt-build $MNTBUILD_DATA
 	sudo rsync -avz $DEV_COPY/db_dumps/ $DB_DUMPS
 }
