@@ -109,7 +109,7 @@ In order to setup dev env on your local you'll need to do the following:
 	* redis
 	* postfix
 	* buildfs
-	* insternal_repo
+	* internal_repo
 	* merged_repo
 	* reverse_proxy
 
