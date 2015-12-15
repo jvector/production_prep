@@ -57,7 +57,7 @@ set_secure_config database.password "${PGPASSWORD}"
 
 # Integration
 # Add a few extra's to sudo
-cat /sudo.txt >> /etc/sudoers
+cat /usr/src/sudo.txt >> /etc/sudoers
 
 cp -a /etc_copy/* ${GERRIT_SITE}/etc
 

@@ -15,6 +15,7 @@ RUN apt-get update && apt-get -y upgrade \
 					ntpdate \
 					build-essential \
 					rsync \
+					genisoimage \
 					doxygen reprepro \
 					sbuild git-buildpackage dh-autoreconf liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
@@ -79,7 +80,7 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 COPY etc_ssh/ /etc/ssh
 
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd -s /bin/bash -u 1001 build
+RUN useradd -s /bin/bash -u 9000 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf

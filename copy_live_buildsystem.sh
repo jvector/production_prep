@@ -7,7 +7,7 @@ GERRIT_LIVE=192.168.128.59
 
 #Container gerrit2/build user UIDs
 GERRIT_UID=1000
-BUILD_UID=1001
+BUILD_UID=9000
 
 # Note: root on the gerrit-containerhost has a copy of the live
 # buildsystem user 'build's ssh keys and is vconfigured to use them as
@@ -18,7 +18,7 @@ RSYNC_OPTS="-az --dry-run"
 function copy_jenkins_jobs {
 	rsync ${RSYNC_OPTS} ${JENKINS}:/var/lib/jenkins/jobs $JENKINS_DATA
 	# 100GB
-	# owner build (1001), 755 on server
+	# owner build (9000), 755 on server
 }
 
 function copy_gerrit_gits {

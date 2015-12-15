@@ -25,6 +25,8 @@ RUN apt-get update && apt-get -y -q install \
     reprepro \
     sbuild \
     less \
+    screen \
+    tmux \
     postgresql-client-9.4 \
     perl libwww-bugzilla-perl libipc-run-perl libjson-perl \
     libparse-debcontrol-perl libxml-dom-perl \
@@ -55,12 +57,10 @@ COPY apt-keys /var/lib/sbuild/apt-keys
 COPY ssh_config /var/gerrit/.ssh/config
 	# /etc/ssh for persistent host
 COPY etc_ssh/ /etc/ssh
-	# Extra's
-COPY sudo.txt /sudo.txt
 
 # Build user
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd -s /bin/bash -u 1001 build
+RUN useradd -s /bin/bash -u 9000 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 RUN chown build:build /usr/src/ -Rf

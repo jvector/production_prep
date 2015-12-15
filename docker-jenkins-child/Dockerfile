@@ -19,6 +19,7 @@ RUN apt-get update && apt-get -y upgrade \
 					ntpdate \
 					rpcbind \
 					sbuild \
+					genisoimage \
 					doxygen reprepro \
 					git-buildpackage liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
@@ -47,7 +48,7 @@ RUN apt-get update && apt-get -y upgrade \
 # nfs-common, portmap
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
-RUN useradd -s /bin/bash -u 1001 build
+RUN useradd -s /bin/bash -u 9000 build
 RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
@@ -105,5 +106,8 @@ RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
 
 # tmpfs optimization - requires a mount -a in start script
 COPY fstab /etc/fstab
+
+# For the workspaces
+RUN mkdir -p /var/lib/jenkins && chown 9000:9000 /var/lib/jenkins
 
 CMD ["/jenkins-child-start.sh"]

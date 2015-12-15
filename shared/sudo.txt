@@ -5,4 +5,5 @@ build ALL=(gerrit2) NOPASSWD: /usr/bin/git
 # For genesis to create schroots
 build ALL=(root) NOPASSWD: /usr/src/buildsystem/genesis/genesis-make-schroot
 # For isogen
-build ALL=(root) NOPASSWD: /usr/bin/make"
+build ALL=(root) NOPASSWD: /usr/bin/make
+build ALL=(root) NOPASSWD: /usr/bin/perl

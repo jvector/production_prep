@@ -88,7 +88,7 @@ REVERSE_PROXY_NAME=${REVERSE_PROXY_NAME:-reverse-proxy-container}
 ########### container
 
 GERRIT2_USER_UID=${GERRIT2_USER_UID:-1000}
-BUILD_USER_UID=${BUILD_USER_UID:-1001}
+BUILD_USER_UID=${BUILD_USER_UID:-9000}
 POSTGRES_USER_UID=${POSTGRES_USER_UID:-999}
 
 function wait {
@@ -528,7 +528,7 @@ function rm_internal_repo {
 function build_merged_repo {
     docker build \
         -t ${MERGED_REPO_IMAGE} \
-        --build-arg SERVER_ROOT=/mnt/aptly-debianizer-serve/live \
+        --build-arg SERVER_ROOT=/mnt/aptly-debianizer \
         docker-sw-lighttpd || \
     fail "Building image ${MERGED_REPO_IMAGE} failed"
 }
@@ -537,7 +537,7 @@ function run_merged_repo {
     echo "Starting Merged Repository.."
     docker run \
         --name ${MERGED_REPO_NAME} \
-        -v ${APTLY_DEBIANIZER_SERVE_DATA}:/mnt/aptly-debianizer-serve \
+        -v ${APTLY_DEBIANIZER_DATA}:/mnt/aptly-debianizer \
         --net=${DOCKER_NETWORK} \
         -d ${MERGED_REPO_IMAGE}
     echo "Merged repository container ${MERGED_REPO_NAME} running."
@@ -716,7 +716,7 @@ function make_mount_directories {
         $SRV_CHROOT_DATA \
         $ETC_SCHROOT_CHROOTD \
         ; do
-            mkdir -p $i
+            [ -e $i ] || mkdir -p $i
     done
 }
 
