@@ -9,46 +9,46 @@ GERRIT_LIVE=192.168.128.59
 GERRIT_UID=1000
 BUILD_UID=9000
 
-# Note: root on the gerrit-containerhost has had his own
-# ssh-keygen-generated keys copied over to the existing buildsystem
-# servers using the existing 'victor' login
+# Note: root on the gerrit-containerhost has a copy of the live
+# buildsystem user 'build's ssh keys and is vconfigured to use them as
+# the user build when rsyncing.
 
 RSYNC_OPTS="-az --dry-run"
 
 function copy_jenkins_jobs {
-	rsync ${RSYNC_OPTS} victor@${JENKINS}:/var/lib/jenkins/jobs $JENKINS_DATA
+	rsync ${RSYNC_OPTS} ${JENKINS}:/var/lib/jenkins/jobs $JENKINS_DATA
 	# 100GB
 	# owner build (9000), 755 on server
 }
 
 function copy_gerrit_gits {
 	# Gerrit:
-	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/gerrit/ $GERRIT_GIT_DATA/
+	rsync ${RSYNC_OPTS} ${GERRIT_LIVE}:/usr/src/gerrit/ $GERRIT_GIT_DATA/
 	# 6GB
 	# owned by gerrit2, 755 on server. Here we have user 'container' with id=1000
 }
 
 function copy_chroots {
-	rsync ${RSYNC_OPTS} victor@${JENKINS}:/srv/chroot/ $SRV_CHROOT_DATA/
+	rsync ${RSYNC_OPTS} ${JENKINS}:/srv/chroot/ $SRV_CHROOT_DATA/
 	# 23GB
 	# owned by root , 755 on source and on dest
 }
 
 function copy_chroot_configs {
-	rsync ${RSYNC_OPTS} victor@${GERRIT_LIVE}:/etc/schroot/chroot.d/ $ETC_SCHROOT_CHROOTD/
+	rsync ${RSYNC_OPTS} ${GERRIT_LIVE}:/etc/schroot/chroot.d/ $ETC_SCHROOT_CHROOTD/
 	# 616KB
 	# owned by root , 755 on source and on dest
 }
 
 function copy_internal_repo {
-	rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/repository/ $REPO_DATA/
+	rsync ${RSYNC_OPTS} ${GERRIT_LIVE}:/usr/src/repository/ $REPO_DATA/
 	# 100GB
 	# owner build (uid 9000) , 755 on server
 }
 
 # function copy_merged_repo {
 	# FIXME: Does this get lumped into debianizer or s3?
-	#rsync ${RSYNC_OPTS} victor@$GERRIT_LIVE:/usr/src/aptly/ $APTLY_DEBIANIZER_DATA/
+	#rsync ${RSYNC_OPTS} ${GERRIT_LIVE}:/usr/src/aptly/ $APTLY_DEBIANIZER_DATA/
 
 	# 65GB
 	# owner build, 755
@@ -81,27 +81,28 @@ function copy_db_backups {
 	# Database Dumps
 	# owner postgres, 644
 
-	# LATEST_BUGZ_BACKUP=$(ssh victor@$GERRIT_LIVE "ls -t /global/maintenance/bugzilla_backups/ | head -1")
+	# LATEST_BUGZ_BACKUP=$(ssh ${GERRIT_LIVE} "ls -t /global/maintenance/bugzilla_backups/ | head -1")
 	# OUR_BUGZ_DUMP_GZ=$DB_DUMPS/bugs_backup.sql.gz
 	# OLD_BUGZ_DUMP=$DB_DUMPS/bugs_backup.sql
-	# rsync -av victor@${GERRIT_LIVE}:/global/maintenance/bugzilla_backups/${LATEST_BUGZ_BACKUP} ${OUR_BUGZ_DUMP_GZ}
+	# rsync -av ${GERRIT_LIVE}:/global/maintenance/bugzilla_backups/${LATEST_BUGZ_BACKUP} ${OUR_BUGZ_DUMP_GZ}
 	# rm ${OLD_BUGZ_DUMP}
 	# gunzip ${OUR_BUGZ_DUMP_GZ}
 
-	LATEST_GERRIT_BACKUP=$(ssh victor@$GERRIT_LIVE "ls -t /global/maintenance/gerrit_backups/ | head -1")
+	LATEST_GERRIT_BACKUP=$(ssh ${GERRIT_LIVE} "ls -t /global/maintenance/gerrit_backups/ | head -1")
 	OUR_GERRIT_DUMP_GZ=$DB_DUMPS/gerrit_backup.sql.gz
 	OLD_GERRIT_DUMP=$DB_DUMPS/gerrit_backup.sql
-	rsync -av victor@${GERRIT_LIVE}:/global/maintenance/gerrit_backups/${LATEST_GERRIT_BACKUP} ${OUR_GERRIT_DUMP_GZ}
+	rsync -av ${GERRIT_LIVE}:/global/maintenance/gerrit_backups/${LATEST_GERRIT_BACKUP} ${OUR_GERRIT_DUMP_GZ}
 	rm ${OLD_GERRIT_DUMP}
 	gunzip ${OUR_GERRIT_DUMP_GZ}
 }
 
+# function copy_dev, for setting up a local workstation build system,
+# depends on NFS being present for /global
 function copy_dev {
 	DEV_COPY=/global/users/jonathan.barron/cbuildsystem-starter-pack
-	echo "Files required are @ ${DEV_COPY}, for now come and find Jon/Victor"
+	echo "Files required are copied from ${DEV_COPY}"
 
-	sudo rsync -avz $DEV_COPY/container-mounts/ $BUILD_HOME_CONT
-	sudo chmod 600 $BUILD_HOME_CONT/home/build/.ssh/id_rsa
-	sudo rsync -avz $DEV_COPY/buildfs-mounts/mnt-build $MNTBUILD_DATA
-	sudo rsync -avz $DEV_COPY/db_dumps/ $DB_DUMPS
+	sudo rsync -avz ${DEV_COPY}/container-mounts/ $BUILD_HOME
+	sudo chmod 600 ${BUILD_HOME}/home-build-test/build/.ssh/id_rsa
+	sudo rsync -avz ${DEV_COPY}/db_dumps/ $DB_DUMPS
 }

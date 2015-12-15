@@ -58,7 +58,6 @@ JENKINS_CHILD1_NAME=${JENKINS_CHILD1_NAME:-jenchild1-container}
 JENKINS_CHILD2_NAME=${JENKINS_CHILD2_NAME:-jenchild2-container}
     # Data
 JENKINS_DATA=${JENKINS_DATA:-/var/lib/containers/${JENKINS_MASTER_IMAGE}}
-SYSADMINMAIL=${SYSADMINMAIL:-maintenance@smoothwall.net}
 
 # Bugzilla
 BUGZILLA_IMAGE=${BUGZILLA_IMAGE:-sw/bugzilla}
@@ -87,8 +86,6 @@ REVERSE_PROXY_NAME=${REVERSE_PROXY_NAME:-reverse-proxy-container}
 
 ########### Urls on buildfs, which we will probably run in a dedicated
 ########### container
-
-BUILDLOGS_URL=${BUILDLOGS_URL:-http://$HOST:6789/logs}
 
 GERRIT2_USER_UID=${GERRIT2_USER_UID:-1000}
 BUILD_USER_UID=${BUILD_USER_UID:-9000}
@@ -191,13 +188,7 @@ function run_jenkins {
         -p 9000:8080 \
         -p 49999:49999 \
         -p 50000:50000 \
-        -e "SYSADMINMAIL=${SYSADMINMAIL}" \
         -e "GERRIT_NAME=${GERRIT_NAME}" \
-        -e "JENCHILD1_HOSTNAME=${JENKINS_CHILD1_NAME}" \
-        -e "JENCHILD2_HOSTNAME=${JENKINS_CHILD2_NAME}" \
-        -e "JENCHILD1_EXECUTORS=2" \
-        -e "JENCHILD2_EXECUTORS=2" \
-        -e "BUILDLOGS_URL=${BUILDLOGS_URL}" \
         -e "HOST=${HOST}" \
         --net=${DOCKER_NETWORK} \
         -d ${JENKINS_MASTER_IMAGE}
