@@ -27,6 +27,7 @@ RUN apt-get update && apt-get -y -q install \
     less \
     screen \
     tmux \
+    rsync \
     postgresql-client-9.4 \
     perl libwww-bugzilla-perl libipc-run-perl libjson-perl \
     libparse-debcontrol-perl libxml-dom-perl \
