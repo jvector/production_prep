@@ -734,7 +734,7 @@ function make_mount_directories {
 # and then once data is imported into them, so do their contents
 function change_permissions_of_mounts {
     # Chown everything to build
-    sudo chown -R $BUILD_USER_UID:$BUILD_USER_UID $BUILD_HOME
+    sudo chown -R $BUILD_USER_UID:$BUILD_USER_UID $BUILD_HOME_CONT
     # Then rechown those which need to be other.
     # chroot's in srv-chroot & chroot config's in etc-schroot need to be root
     sudo chown -R 0:0 $ETC_SCHROOT_CHROOTD $SRV_CHROOT_DATA
