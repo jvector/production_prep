@@ -123,14 +123,14 @@ In order to setup dev env on your local you'll need to do the following:
 	It requires an argument, the options are 'jenkins', 'gerrit', 'singlehost' or 'dev'.
     * **jenkins** - Not yet fully implemented, aiming to be used to get the relevant data used by a Jenkins-only Buildwhale
     * **gerrit** - Not yet fully implemented, aiming to be used to get the relevant data used by a Gerrit-only Buildwhale
-    * **singlehost** - Grab a copy of all data from \*.metal.* buildsystem to create an replication of live including all its data. *note: 300GB+ data being moved around*
+    * **singlehost** - Grab a copy of all data from \*.metal.\* buildsystem to create an replication of live including all its data. *note: 300GB+ data being moved around*
     * **dev** - Populate your $BUILD_HOME with a small subset of data, a couple gits and chroot's, enough to be used as a local test buildsystem. *note: needs sotonfs mounted as /global*
 	
 
 #### On a Buildwhale (Production)
 * Run the steps above, resulting in an empty buildsystem being created.
 * Verify that $BUILD_HOME is where you expected it to be, and that the partition it is on has sufficient space.
-* Generate a ssh-key and add that to .metal.Gerrit/Jenkins against user victor (FIXME)
+* Copy the live buildsystem's `build` user's SSH keys to the container host's `root` user.
 * Run `/import.sh singlehost` and wait.
 * Data will be rsync'd from Live, and when finished the containers reloaded. *note: reloading them will take a further 20mins+*
 
