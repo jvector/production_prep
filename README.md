@@ -130,7 +130,7 @@ In order to setup dev env on your local you'll need to do the following:
 #### On a Buildwhale (Production)
 * Run the steps above, resulting in an empty buildsystem being created.
 * Verify that $BUILD_HOME is where you expected it to be, and that the partition it is on has sufficient space.
-* Generate a ssh-key and add that to .metal.Gerrit/Jenkins against user victor (FIXME)
+* Copy the live buildsystem's `build` user's SSH keys to the container host's `root` user.
 * Run `/import.sh singlehost` and wait.
 * Data will be rsync'd from Live, and when finished the containers reloaded. *note: reloading them will take a further 20mins+*
 
