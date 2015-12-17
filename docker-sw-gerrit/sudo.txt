@@ -1,8 +1,0 @@
-# For the experimental->reviewed include on Gerrit submits
-gerrit2 ALL=(build) NOPASSWD: /usr/bin/reprepro
-# For genesis to perform git pushes
-build ALL=(gerrit2) NOPASSWD: /usr/bin/git
-# For genesis to create schroots
-build ALL=(root) NOPASSWD: /usr/src/buildsystem/genesis/genesis-make-schroot
-# For isogen
-build ALL=(root) NOPASSWD: /usr/bin/make"

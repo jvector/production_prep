@@ -3,6 +3,9 @@
 FROM debian:jessie
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
+ARG BUILD_USER_PASSWORD
+ARG CHILD_SEQ
+
 # Prevents invoke-rc.d errors
 RUN sed -i -e "s/^exit 101$/exit 0/" /usr/sbin/policy-rc.d
 
@@ -11,10 +14,12 @@ RUN apt-get update && apt-get -y upgrade \
 					default-jre \
 					build-essential \
 					git \
+					rsync \
 					openssh-server \
 					ntpdate \
 					rpcbind \
 					sbuild \
+					genisoimage \
 					doxygen reprepro \
 					git-buildpackage liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
@@ -43,7 +48,8 @@ RUN apt-get update && apt-get -y upgrade \
 # nfs-common, portmap
 
 # jenchild1 server setup from wiki , up to 'Needed Packages' section..
-RUN useradd -u 1001 build
+RUN useradd -s /bin/bash -u 9000 build
+RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
 
 # buildsystem - Common files are copied in via mkbuildsystem script.
 # If you want to build this manually, and the files don't exist it will error.
@@ -70,12 +76,6 @@ RUN git clone https://github.com/hubnerd/pod2projdocs.git /root/pod2projdocs \
 	&& rm -Rf /root/pod2projdocs \
 	&& cd -
 
-# Copy in Chroot config's
-# FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
-# on demand from live. For now we have copies of these files.
-COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
-COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
-
 # Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
 
@@ -86,6 +86,9 @@ COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 # sbuild user config
 RUN sbuild-adduser build
 COPY .sbuildrc /home/build/.sbuildrc
+
+	# /etc/ssh for persistent host
+COPY etc_ssh$CHILD_SEQ/ /etc/ssh
 
 # Install aptly
 RUN /usr/src/aptly_setup.sh
@@ -100,5 +103,11 @@ EXPOSE 9500
 
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get -y install vim && rm -rf /var/lib/apt/lists/*
+
+# tmpfs optimization - requires a mount -a in start script
+COPY fstab /etc/fstab
+
+# For the workspaces
+RUN mkdir -p /var/lib/jenkins && chown 9000:9000 /var/lib/jenkins
 
 CMD ["/jenkins-child-start.sh"]

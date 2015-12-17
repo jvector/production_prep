@@ -1,0 +1,24 @@
+## cbuildsystem - IMAGE-NAME
+
+### About this image
+
+Brief descripion of what/where/why/how
+
+### Build example
+
+```
+DOCKER BUILD EXAMPLE
+```
+
+###### Notes
+* Notes on above
+
+### Run example
+```
+DOCKER RUN EXAMPLE
+```
+###### Notes
+* Notes on above
+
+### Extras
+Notes on any extra functionality provided

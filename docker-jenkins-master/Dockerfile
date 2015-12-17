@@ -3,6 +3,8 @@
 FROM jenkins:1.609.3
 MAINTAINER Smoothwall Ltd <maintenance@smoothwall.net>
 
+ARG BUILD_USER_PASSWORD
+
 USER root
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -12,6 +14,8 @@ RUN apt-get update && apt-get -y upgrade \
 					openssh-server \
 					ntpdate \
 					build-essential \
+					rsync \
+					genisoimage \
 					doxygen reprepro \
 					sbuild git-buildpackage dh-autoreconf liblog-log4perl-perl \
 					libtest-spec-perl libtest-mockmodule-perl \
@@ -69,29 +73,16 @@ COPY shared/sbuild.conf /etc/sbuild/sbuild.conf
 	# Circumvent this by copying manually from one level up, or run copy_shared in
 	# container_functions.sh
 COPY shared /usr/src/
-	#Plugins
-COPY plugins/ ${JENKINS_HOME}/plugins
-COPY plugins.txt /plugins.txt
-	#Config files
-COPY config_files/ ${JENKINS_HOME}
-	#Scripts
-COPY scripts/ /scripts
 COPY jenkins-start.sh /
-	# Copy in Chroot config's
-	# FIXME: Should be just copy all chroot.d's in. Which themselves are generated/pulled
-	# on demand from live. For now we have copies of these files.
-COPY chroot.d/reviewed-edinburgh-i386-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-i386-sbuild
-COPY chroot.d/reviewed-edinburgh-amd64-sbuild /etc/schroot/chroot.d/reviewed-edinburgh-amd64-sbuild
-	# Jenkins plugin's
-	# This could also be done by passing plugins.txt to plugins.sh,
-	# but that requires redownloading all the plugins (which don't change)
-	# each time it is built
-COPY pluginjars/ /usr/share/jenkins/ref/plugins
 	# Global repo signing key
 COPY apt-keys /var/lib/sbuild/apt-keys
+	# /etc/ssh for persistent host
+COPY etc_ssh/ /etc/ssh
 
 # Create build user, let it use /usr/src/. Allow jenkins also
-RUN useradd build
+RUN useradd -s /bin/bash -u 9000 build
+RUN echo "build:$BUILD_USER_PASSWORD" | sudo chpasswd
+
 RUN chown build:build /usr/src/ -Rf
 
 # Put patch-configuration in the right place
@@ -100,7 +91,6 @@ RUN mv /usr/src/patch-configuration.json /etc/patch-configuration.json
 # Install aptly
 RUN /usr/src/aptly_setup.sh
 
-# For now this is jenkins, might need changing to build.
 # sbuild user config
 RUN sbuild-adduser build
 COPY .sbuildrc /home/build/.sbuildrc
@@ -111,5 +101,8 @@ RUN ln -s /usr/src/buildsystem/sbuildhooks/sbuild-hook-addbuilduser /etc/schroot
 
 # DEV ONLY REMOVE BEFORE releases
 RUN apt-get update && apt-get install -y vim && rm -rf /var/lib/apt/lists/*
+
+# tmpfs optimization - requires a mount -a in start script
+COPY fstab /etc/fstab
 
 CMD ["/jenkins-start.sh"]

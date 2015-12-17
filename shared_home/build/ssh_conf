@@ -1,5 +1,5 @@
 Host gerrit
 User build
-HostName gerrit
+HostName gerrit.container.soton.smoothwall.net
 Port 29418
 StrictHostKeyChecking No
