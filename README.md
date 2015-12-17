@@ -32,12 +32,6 @@ In order to setup dev env on your local you'll need to do the following:
 	git clone git@github.com:[YOUR GITHUB ACCOUNT]/cbuildsystem.git /path/to/your/local/repos/cbuildsystem
 	```
 
-* Currently all development happens on the gerrit-containerhost branch. So this needs to be checked out:
-
-	```
-	git checkout gerrit-containerhost
-	```
-
 * Set you BUILD_HOME path:
 
 	```
