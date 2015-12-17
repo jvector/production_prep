@@ -10,7 +10,7 @@ GERRIT_UID=1000
 BUILD_UID=9000
 
 # Note: root on the gerrit-containerhost has a copy of the live
-# buildsystem user 'build's ssh keys and is vconfigured to use them as
+# buildsystem user 'build's ssh keys and is configured to use them as
 # the user build when rsyncing.
 
 RSYNC_OPTS="-az --dry-run"
